@@ -81,8 +81,8 @@ class DymoAPI {
         return await PublicAPI.getPrayerTimes(data);
     }
 
-    async inputSatinizer(data: any): Promise<any> {
-        return await PublicAPI.inputSatinizer(data);
+    async satinizer(data: any): Promise<any> {
+        return await PublicAPI.satinizer(data);
     }
 
     async isValidPwd(data: any): Promise<any> {

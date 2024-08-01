@@ -5,7 +5,8 @@ declare module "dymo-api" {
     }
 
     class DymoAPI {
-        constructor(configuration: ConfigurationOptions);
+        private configuration: ConfigurationOptions;
+        constructor(configuration?: ConfigurationOptions);
         initializeTokens(): Promise<void>;
         isValidData(data: any): Promise<any>;
         getPrayerTimes(data: any): Promise<any>;
@@ -15,4 +16,4 @@ declare module "dymo-api" {
     }
 
     export { DymoAPI };
-};
+}

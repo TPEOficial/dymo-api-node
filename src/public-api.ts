@@ -38,7 +38,7 @@ export const getPrayerTimes = async (data: PrayerTimesData): Promise<any> => {
     }
 };
 
-export const inputSatinizer = async (data: InputSatinizerData): Promise<any> => {
+export const satinizer = async (data: InputSatinizerData): Promise<any> => {
     const { input } = data;
     if (input === undefined) throw customError(1000, "You must specify at least the input.");
     try {
