@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createCustomError } from "./errors/custom-error";
+import { createCustomError } from "./utils/custom-error";
 
 export const getPrayerTimes = async (data: PrayerTimesData): Promise<any> => {
     const { lat, lon } = data;

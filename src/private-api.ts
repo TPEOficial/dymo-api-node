@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createCustomError } from "./errors/custom-error";
+import { createCustomError } from "./utils/custom-error";
 
 export const isValidData = async (token: string | null, data: Data): Promise<any> => {
     if (token === null) throw createCustomError(3000, "Invalid private token.");
