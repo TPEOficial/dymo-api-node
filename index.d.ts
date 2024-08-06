@@ -15,5 +15,5 @@ declare module "dymo-api" {
         newURLEncrypt(data: any): Promise<any>;
     }
 
-    export { DymoAPI };
+    export { DymoAPI, ConfigurationOptions };
 }

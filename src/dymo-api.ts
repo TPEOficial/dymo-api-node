@@ -1,22 +1,8 @@
 import axios from "axios";
 import * as PrivateAPI from "./private-api";
 import * as PublicAPI from "./public-api";
-import config from "./config";
-
-const customError = (code: number, message: string): Error => {
-    const error = new Error();
-    return Object.assign(error, { code, message: `[${config.lib.name}] ${message}` });
-};
-
-interface TokensResponse {
-    root: boolean;
-    api: boolean;
-}
-
-interface Tokens {
-    root?: string;
-    api?: string;
-}
+import config from "./config/config";
+import { createCustomError } from "./errors/custom-error";
 
 class DymoAPI {
     private rootApiKey: string | null;
@@ -24,7 +10,7 @@ class DymoAPI {
     private tokensResponse: TokensResponse | null;
     private lastFetchTime: Date | null;
 
-    constructor({ rootApiKey = null, apiKey = null }: { rootApiKey?: string | null; apiKey?: string | null }) {
+    constructor({ rootApiKey = null, apiKey = null }: DymoAPIConstructorOptions) {
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
         this.tokensResponse = null;
@@ -51,15 +37,15 @@ class DymoAPI {
                 { tokens }
             );
 
-            if (tokens.root && response.data.data.root === false) throw customError(3000, "Invalid root token.");
-            if (tokens.api && response.data.data.api === false) throw customError(3000, "Invalid API token.");
+            if (tokens.root && response.data.data.root === false) throw createCustomError(3000, "Invalid root token.");
+            if (tokens.api && response.data.data.api === false) throw createCustomError(3000, "Invalid API token.");
 
             this.tokensResponse = response.data.data;
             this.lastFetchTime = currentTime;
             console.log(`[${config.lib.name}] Tokens initialized successfully.`);
             return this.tokensResponse;
         } catch (error: any) {
-            throw customError(5000, error.message);
+            throw createCustomError(5000, error.message);
         }
     }
 
@@ -67,7 +53,7 @@ class DymoAPI {
         try {
             await this.getTokens();
         } catch (error: any) {
-            throw customError(5000, `Error initializing tokens: ${error.message}`);
+            throw createCustomError(5000, `Error initializing tokens: ${error.message}`);
         }
     }
 
