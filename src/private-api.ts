@@ -31,7 +31,7 @@ export const isValidData = async (token: string | null, data: Data): Promise<any
     
     let i = false;
     for (const key in data) {
-        if (data.hasOwnProperty(key) && (key === "email" || key === "tel" || key === "domain" || key === "creditCard" || key === "ip")) {
+        if (data.hasOwnProperty(key) && (key === "email" || key === "phone" || key === "domain" || key === "creditCard" || key === "ip")) {
             i = true;
             break;
         }

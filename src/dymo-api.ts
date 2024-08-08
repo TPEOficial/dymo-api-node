@@ -11,12 +11,12 @@ const customError = (code: number, message: string): Error => {
 interface TokensResponse {
     root: boolean;
     api: boolean;
-}
+};
 
 interface Tokens {
     root?: string;
     api?: string;
-}
+};
 
 class DymoAPI {
     private rootApiKey: string | null;
@@ -37,7 +37,7 @@ class DymoAPI {
         if (this.tokensResponse && this.lastFetchTime && (currentTime.getTime() - this.lastFetchTime.getTime()) < 5 * 60 * 1000) {
             console.log(`[${config.lib.name}] Using cached tokens response.`);
             return this.tokensResponse;
-        }
+        };
 
         const tokens: Tokens = {};
         if (this.rootApiKey) tokens.root = `Bearer ${this.rootApiKey}`;

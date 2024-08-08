@@ -1,13 +1,14 @@
 name: Publish Package
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
   publish:
+    name: publish
     runs-on: ubuntu-latest
+    environment: publish
 
     steps:
     - name: Checkout code

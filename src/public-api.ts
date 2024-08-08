@@ -9,11 +9,11 @@ const customError = (code: number, message: string): Error => {
 interface PrayerTimesData {
     lat?: number;
     lon?: number;
-}
+};
 
 interface InputSatinizerData {
     input?: string;
-}
+};
 
 interface IsValidPwdData {
     email?: string;
@@ -21,11 +21,11 @@ interface IsValidPwdData {
     bannedWords?: string | string[];
     min?: number;
     max?: number;
-}
+};
 
 interface NewURLEncryptData {
     url?: string;
-}
+};
 
 export const getPrayerTimes = async (data: PrayerTimesData): Promise<any> => {
     const { lat, lon } = data;
