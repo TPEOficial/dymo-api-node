@@ -9,6 +9,7 @@ const customError = (code: number, message: string): Error => {
 };
 
 interface TokensResponse {
+    organization: boolean;
     root: boolean;
     api: boolean;
 };
@@ -19,12 +20,15 @@ interface Tokens {
 };
 
 class DymoAPI {
+    private organization: string | null;
     private rootApiKey: string | null;
     private apiKey: string | null;
     private tokensResponse: TokensResponse | null;
     private lastFetchTime: Date | null;
 
-    constructor({ rootApiKey = null, apiKey = null }: { rootApiKey?: string | null; apiKey?: string | null }) {
+    constructor({ organization = null, rootApiKey = null, apiKey = null }: { organization?: string | null; rootApiKey?: string | null; apiKey?: string | null }) {
+        if ((rootApiKey || apiKey) && !organization) throw customError(4000, "Organization is required when at least one token is specified.");
+        this.organization = organization;
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
         this.tokensResponse = null;
@@ -48,7 +52,7 @@ class DymoAPI {
 
             const response = await axios.post<{ data: TokensResponse }>(
                 "https://api.tpeoficial.com/v1/dvr/tokens",
-                { tokens }
+                { organization: this.organization, tokens }
             );
 
             if (tokens.root && response.data.data.root === false) throw customError(3000, "Invalid root token.");
