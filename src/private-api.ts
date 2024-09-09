@@ -39,9 +39,7 @@ export const isValidData = async (token: string | null, data: Data): Promise<any
     if (!i) throw customError(1500, "You must provide at least one parameter.");
     
     try {
-        const response = await axios.post("https://api.tpeoficial.com/v1/private/secure/verify", data, {
-            headers: { "Authorization": token },
-        });
+        const response = await axios.post("https://api.tpeoficial.com/v1/private/secure/verify", data, { headers: { "Authorization": token } });
         return response.data;
     } catch (error: any) {
         throw customError(5000, error.message);
