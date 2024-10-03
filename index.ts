@@ -1,3 +1,3 @@
-import { DymoAPI } from "./src/dymo-api";
+import DymoAPI from "./src/dymo-api";
 
 export default DymoAPI;

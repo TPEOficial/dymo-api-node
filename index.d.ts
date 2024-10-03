@@ -40,5 +40,5 @@ declare module "dymo-api" {
         sendEmail(data: any): Promise<any>;
     }
 
-    export { DymoAPI };
+    export default DymoAPI;
 }

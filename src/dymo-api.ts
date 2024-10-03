@@ -115,4 +115,4 @@ class DymoAPI {
     }
 }
 
-export { DymoAPI };
+export default DymoAPI;
