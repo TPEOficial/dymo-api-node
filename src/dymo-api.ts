@@ -63,10 +63,10 @@ class DymoAPI {
 
         try {
             if (Object.keys(tokens).length === 0) return;
-            const response = await axios.post<{ data: TokensResponse }>(`${BASE_URL}/v1/dvr/tokens`, { tokens });
-            if (tokens.root && response.data.data.root === false) throw customError(3000, "Invalid root token.");
-            if (tokens.api && response.data.data.api === false) throw customError(3000, "Invalid API token.");
-            this.tokensResponse = response.data.data;
+            const response = await axios.post<TokensResponse>(`${BASE_URL}/v1/dvr/tokens`, { tokens });
+            if (tokens.root && response.data.root === false) throw customError(3000, "Invalid root token.");
+            if (tokens.api && response.data.api === false) throw customError(3000, "Invalid API token.");
+            this.tokensResponse = response.data;
             this.lastFetchTime = currentTime;
             console.log(`[${config.lib.name}] Tokens initialized successfully.`);
             return this.tokensResponse;
