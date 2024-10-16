@@ -2,6 +2,7 @@ import axios from "axios";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import config, { BASE_URL, setBaseUrl } from "./config";
+import { checkForUpdates } from "./services/autoupdate";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
@@ -25,6 +26,11 @@ interface ServerEmailConfig {
         user: string;
         pass: string;
     };
+    dkim?: {
+        domainName: string;
+        keySelector: string;
+        privateKey: string;
+    };
 };
 
 class DymoAPI {
@@ -43,6 +49,7 @@ class DymoAPI {
         this.serverEmailConfig = serverEmailConfig;
         this.local = rootApiKey ? local : false; // Only allow setting local if rootApiKey is defined.
         setBaseUrl(this.local);
+        this.autoupdate();
         this.initializeTokens(); // Calls the function to obtain tokens when creating the object.
     }
 
@@ -83,13 +90,22 @@ class DymoAPI {
         }
     }
 
+    private async autoupdate() {
+        try {
+            await checkForUpdates();
+        } catch (error: any) {
+            throw customError(5000, `Error checking the latest version in npmjs: ${error.message}`);
+        }
+    }
+
+
     // FUNCTIONS / Private.
     async isValidData(data: any): Promise<any> {
         return await PrivateAPI.isValidData(this.apiKey, data);
     }
 
     async sendEmail(data: any): Promise<any> {
-        if (this.serverEmailConfig) throw customError(5000, `You must configure the email client settings.`);
+        if (!this.serverEmailConfig) throw customError(5000, `You must configure the email client settings.`);
         return await PrivateAPI.sendEmail(this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
     }
 
