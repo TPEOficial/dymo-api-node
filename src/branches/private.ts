@@ -11,7 +11,7 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
     if (token === null) throw customError(3000, "Invalid private token.");
     let i = false;
     for (const key in data) {
-        if (data.hasOwnProperty(key) && (key === "email" || key === "phone" || key === "domain" || key === "creditCard" || key === "ip")) {
+        if (data.hasOwnProperty(key) && (key === "email" || key === "phone" || key === "domain" || key === "creditCard" || key === "ip" || key === "wallet")) {
             i = true;
             break;
         }

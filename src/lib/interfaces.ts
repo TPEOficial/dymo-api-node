@@ -18,6 +18,7 @@ export interface Validator {
     domain?: string;
     creditCard?: string | CreditCardData;
     ip?: string;
+    wallet?: string;
 };
 
 export interface SRNG {
