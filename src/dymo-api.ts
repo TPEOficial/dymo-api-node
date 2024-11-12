@@ -105,7 +105,7 @@ class DymoAPI {
     }
 
     async sendEmail(data: any): Promise<any> {
-        if (!this.serverEmailConfig) throw customError(5000, `You must configure the email client settings.`);
+        if (!this.serverEmailConfig && !this.rootApiKey) throw customError(5000, `You must configure the email client settings.`);
         return await PrivateAPI.sendEmail(this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
     }
 
