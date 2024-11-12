@@ -5,11 +5,9 @@ const localVersion: string = execSync(`npm list dymo-api --depth=0`).toString().
 
 export async function checkForUpdates(): Promise<void> {
     try {
-        const response = await axios.get<{ version: string }>(`https://registry.npmjs.org/dymo-api/latest`);
+        const response = await axios.get<{ version: string }>("https://registry.npmjs.org/dymo-api/latest");
         const latestVersion: string = response.data.version;
-
         if (localVersion !== latestVersion) console.log(`A new version of dymo-api is available: ${latestVersion}. You are using ${localVersion}. Consider updating.`);
-        else console.log(`You are using the latest version of dymo-api: ${localVersion}.`);
         
     } catch (error: any) {
         if (error.response) console.error("Error fetching the latest version:", error.response.data);

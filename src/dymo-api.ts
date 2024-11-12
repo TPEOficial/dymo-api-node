@@ -53,10 +53,6 @@ class DymoAPI {
         this.initializeTokens(); // Calls the function to obtain tokens when creating the object.
     }
 
-    private getBaseUrl(): string {
-        return this.local ? "http://localhost:3050" : "https://api.tpeoficial.com";
-    }
-
     private async getTokens(): Promise<TokensResponse | undefined> {
         const currentTime = new Date();
         if (this.tokensResponse && this.lastFetchTime && (currentTime.getTime() - this.lastFetchTime.getTime()) < 5 * 60 * 1000) {
@@ -98,19 +94,18 @@ class DymoAPI {
         }
     }
 
-
     // FUNCTIONS / Private.
     async isValidData(data: any): Promise<any> {
-        return await PrivateAPI.isValidData(this.apiKey, data);
+        return await PrivateAPI.isValidData(this.rootApiKey || this.apiKey, data);
     }
 
     async sendEmail(data: any): Promise<any> {
-        if (!this.serverEmailConfig && !this.rootApiKey) throw customError(5000, `You must configure the email client settings.`);
-        return await PrivateAPI.sendEmail(this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
+        if (!this.serverEmailConfig && !this.rootApiKey) throw customError(5000, "You must configure the email client settings.");
+        return await PrivateAPI.sendEmail(this.rootApiKey || this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
     }
 
     async getRandom(data: any): Promise<any> {
-        return await PrivateAPI.getRandom(this.apiKey, data);
+        return await PrivateAPI.getRandom(this.rootApiKey || this.apiKey, data);
     }
 
     // FUNCTIONS / Public.

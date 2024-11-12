@@ -33,7 +33,7 @@ export const getPrayerTimes = async (data: PrayerTimesData): Promise<any> => {
         const response = await axios.get(`${BASE_URL}/v1/public/islam/prayertimes`, { params: data });
         return response.data;
     } catch (error: any) {
-        throw customError(5000, error.message);
+        throw customError(5000, error.response?.data?.message || error.message);
     }
 };
 
@@ -44,7 +44,7 @@ export const satinizer = async (data: InputSatinizerData): Promise<any> => {
         const response = await axios.get(`${BASE_URL}/v1/public/inputSatinizer`, { params: { input: encodeURIComponent(input) } });
         return response.data;
     } catch (error: any) {
-        throw customError(5000, error.message);
+        throw customError(5000, error.response?.data?.message || error.message);
     }
 };
 
@@ -77,7 +77,7 @@ export const isValidPwd = async (data: IsValidPwdData): Promise<any> => {
         const response = await axios.get(`${BASE_URL}/v1/public/validPwd`, { params });
         return response.data;
     } catch (error: any) {
-        throw customError(5000, error.message);
+        throw customError(5000, error.response?.data?.message || error.message);
     }
 };
 
@@ -88,6 +88,6 @@ export const newURLEncrypt = async (data: NewURLEncryptData): Promise<any> => {
         const response = await axios.get(`${BASE_URL}/v1/public/url-encrypt`, { params: data });
         return response.data;
     } catch (error: any) {
-        throw customError(5000, error.message);
+        throw customError(5000, error.response?.data?.message || error.message);
     }
 };
