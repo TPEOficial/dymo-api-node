@@ -268,3 +268,5 @@ class DymoAPI {
 }
 
 export default DymoAPI;
+//@ts-ignore
+module.exports = DymoAPI;

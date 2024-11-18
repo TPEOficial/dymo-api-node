@@ -1,17 +1,23 @@
 {
   "name": "dymo-api",
-  "version": "1.0.39",
+  "version": "1.0.43",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.js",
-  "module": "dist/esm/dymo-api.mjs",
+  "module": "dist/esm/dymo-api.js",
   "types": "dist/types/dymo-api.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/dymo-api.js",
+      "import": "./dist/esm/dymo-api.js"
+    }
+  },
   "files": [
     "dist/**/*",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build": "rimraf dist && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
     "start": "ts-node src/dymo-api.ts",
     "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -34,7 +40,8 @@
   "dependencies": {
     "@react-email/render": "1.0.1",
     "@types/react": "^18.3.5",
-    "axios": "^1.6.8"
+    "axios": "^1.6.8",
+    "rimraf": "^6.0.1"
   },
   "contributors": [
     "TPEOficial (https://github.com/TPEOficial)",
@@ -42,8 +49,7 @@
   ],
   "devDependencies": {
     "@types/axios": "^0.9.36",
-    "@types/node": "^22.0.2",
-    "rimraf": "^6.0.1",
+    "@types/node": "^22.9.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }
