@@ -171,8 +171,11 @@ class DymoAPI {
      * @param {string} data.from - The email address from which the email will be sent.
      * @param {string} data.to - The email address to which the email will be sent.
      * @param {string} data.subject - The subject of the email.
-     * @param {string} data.html - The HTML content of the email.
-     * @param {React.ReactElement} data.react - The React component to be rendered as the email content.
+     * @param {string} [data.html] - The HTML content of the email.
+     * @param {React.ReactElement} [data.react] - The React component to be rendered as the email content.
+     * @param {Object} [data.options] - Content configuration options.
+     * @param {"high" | "normal" | "low" | undefined} [data.options.priority="normal"] - Email priority (default: normal).
+     * @param {boolean} [data.options.composeTailwindClasses] - Whether to compose tailwind classes.
      * @returns {Promise<Object>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the email sending process.
      */

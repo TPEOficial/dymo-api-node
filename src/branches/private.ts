@@ -1,4 +1,7 @@
 import axios from "axios";
+import React from "react";
+//@ts-ignore
+const { twi } = require("tw-to-css");
 import config, { BASE_URL } from "../config"; 
 import { render } from "@react-email/render";
 import * as Interfaces from "../lib/interfaces";
@@ -7,16 +10,27 @@ const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
 };
 
+const convertTailwindToInlineCss = (htmlContent: string): string => {
+    return htmlContent.replace(/class="([^"]+)"/g, (match, classList) => {
+        return match.replace("class", "style").replace(classList, twi(classList, { minify: true, merge: true }));
+    });
+};
+
+/**
+ * Validates the provided data using a secure verification endpoint.
+ * 
+ * @param token - A string or null representing the authentication token. Must not be null.
+ * @param data - An object adhering to the Validator interface, containing at least one of the following fields: 
+ *               email, phone, domain, creditCard, ip, or wallet.
+ * 
+ * @returns A promise that resolves to the response data from the verification endpoint.
+ * 
+ * @throws Will throw an error if the token is null, if none of the required fields are present in the data,
+ *         or if an error occurs during the verification request.
+ */
 export const isValidData = async (token: string | null, data: Interfaces.Validator): Promise<any> => {
     if (token === null) throw customError(3000, "Invalid private token.");
-    let i = false;
-    for (const key in data) {
-        if (data.hasOwnProperty(key) && (key === "email" || key === "phone" || key === "domain" || key === "creditCard" || key === "ip" || key === "wallet")) {
-            i = true;
-            break;
-        }
-    }
-    if (!i) throw customError(1500, "You must provide at least one parameter.");
+    if (!Object.keys(data).some((key) => ["email", "phone", "domain", "creditCard", "ip", "wallet"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
     try {
         const response = await axios.post(`${BASE_URL}/v1/private/secure/verify`, data, { headers: { "Authorization": token } });
         return response.data;
@@ -25,12 +39,26 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
     }
 };
 
+
+/**
+ * Sends an email using the configured email client settings.
+ *
+ * This method requires a valid private token to be set.
+ *
+ * @param token - A string or null representing the authentication token. Must not be null.
+ * @param data - An object adhering to the SendEmail interface, containing the following fields:
+ *               from, to, subject, html, and optionally react and options.
+ *
+ * @returns A promise that resolves to the response from the server.
+ *
+ * @throws Will throw an error if there is an issue with the email sending process.
+ */
 export const sendEmail = async (token: string | null, data: Interfaces.SendEmail): Promise<any> => {
     if (token === null) throw customError(3000, "Invalid private token.");
     if (!data.from) throw customError(1500, "You must provide an email address from which the following will be sent.");
     if (!data.to) throw customError(1500, "You must provide an email to be sent to.");
     if (!data.subject) throw customError(1500, "You must provide a subject for the email to be sent.");
-    if (!data.html && !data.react) throw customError(1500, "You must provide HTML or a React component.");
+    if (!data.html && !data.react && !React.isValidElement(data.react)) throw customError(1500, "You must provide HTML or a React component.");
     if (data.html && data.react) throw customError(1500, "You must provide only HTML or a React component, not both.");
     try {
         if (data.react) {
@@ -38,6 +66,8 @@ export const sendEmail = async (token: string | null, data: Interfaces.SendEmail
             data.html = await render(data.react as React.ReactElement);
             delete data.react;
         }
+        if (data.options && data.options.composeTailwindClasses) data.html = convertTailwindToInlineCss(data.html as string);
+        
     } catch (error) {
         throw customError(1500, `An error occurred while rendering your React component. Details: ${error}`);
     }
@@ -49,6 +79,19 @@ export const sendEmail = async (token: string | null, data: Interfaces.SendEmail
     }
 };
 
+/**
+ * Retrieves a random number within a specified range using a secure endpoint.
+ * 
+ * @param token - A string or null representing the authentication token. Must not be null.
+ * @param data - An object adhering to the SRNG interface, containing 'min' and 'max' fields, 
+ *               which define the inclusive range within which the random number should be generated.
+ * 
+ * @returns A promise that resolves to the response data containing the random number.
+ * 
+ * @throws Will throw an error if the token is null, if 'min' or 'max' are not defined, 
+ *         if 'min' is not less than 'max', if 'min' or 'max' are out of the allowed range,
+ *         or if an error occurs during the request to the random number generator endpoint.
+ */
 export const getRandom = async (token: string | null, data: Interfaces.SRNG): Promise<any> => {
     if (token === null) throw customError(3000, "Invalid private token.");
     if (!data.min || !data.max) throw customError(1500, "Both 'min' and 'max' parameters must be defined.");

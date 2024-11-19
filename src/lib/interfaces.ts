@@ -27,4 +27,14 @@ export interface SRNG {
     quantity?: number;
 }
 
-export type SendEmail = | { from: string; to: string; subject: string; html: string; react?: never } | { from: string; to: string; subject: string; html?: never; react: React.ReactNode };
+export interface SendEmail { 
+    from: string; 
+    to: string; 
+    subject: string; 
+    html?: string; 
+    react?: never; 
+    options?: { 
+        priority?: "high" | "normal" | "low" | undefined;
+        composeTailwindClasses?: boolean;
+    };
+}
