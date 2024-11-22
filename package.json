@@ -1,6 +1,6 @@
 {
   "name": "dymo-api",
-  "version": "1.0.47",
+  "version": "1.0.49",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.js",
   "module": "dist/esm/dymo-api.js",
@@ -8,7 +8,8 @@
   "exports": {
     ".": {
       "require": "./dist/cjs/dymo-api.js",
-      "import": "./dist/esm/dymo-api.js"
+      "import": "./dist/esm/dymo-api.js",
+      "types": "./dist/types/dymo-api.d.ts"
     }
   },
   "files": [

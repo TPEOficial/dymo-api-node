@@ -66,8 +66,10 @@ export const sendEmail = async (token: string | null, data: Interfaces.SendEmail
             data.html = await render(data.react as React.ReactElement);
             delete data.react;
         }
-        if (data.options && data.options.composeTailwindClasses) data.html = convertTailwindToInlineCss(data.html as string);
-        
+        if (data.options && data.options.composeTailwindClasses) {
+            data.html = convertTailwindToInlineCss(data.html as string);
+            delete data.options.composeTailwindClasses;
+        }
     } catch (error) {
         throw customError(1500, `An error occurred while rendering your React component. Details: ${error}`);
     }
