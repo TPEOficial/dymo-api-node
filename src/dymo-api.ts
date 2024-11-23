@@ -176,6 +176,11 @@ class DymoAPI {
      * @param {Object} [data.options] - Content configuration options.
      * @param {"high" | "normal" | "low" | undefined} [data.options.priority="normal"] - Email priority (default: normal).
      * @param {boolean} [data.options.composeTailwindClasses] - Whether to compose tailwind classes.
+     * @param {Attachment[]} [data.attachments] - An array of attachments to be included in the email.
+     * @param {string} data.attachments[].filename - The name of the attached file.
+     * @param {string} [data.attachments[].path] - The path or URL of the attached file. Either this or `content` must be provided.
+     * @param {Buffer} [data.attachments[].content] - The content of the attached file as a Buffer. Either this or `path` must be provided.
+     * @param {string} [data.attachments[].cid] - The CID (Content-ID) of the attached file, used for inline images.
      * @returns {Promise<Object>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the email sending process.
      */

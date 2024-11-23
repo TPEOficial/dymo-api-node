@@ -13,6 +13,7 @@ export interface ConfigurationOptions {
     };
 }
 
+//@ts-ignore
 declare module "dymo-api" {
     class DymoAPI {
         private rootApiKey: string | null;
