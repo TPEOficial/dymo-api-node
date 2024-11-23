@@ -27,6 +27,13 @@ export interface SRNG {
     quantity?: number;
 }
 
+export type Attachment = {
+    filename: string;
+    path?: string;
+    content?: string | Buffer;
+    cid?: string;
+};
+
 export interface SendEmail { 
     from: string; 
     to: string; 
@@ -37,4 +44,5 @@ export interface SendEmail {
         priority?: "high" | "normal" | "low" | undefined;
         composeTailwindClasses?: boolean;
     };
+    attachments?: Attachment[];
 }

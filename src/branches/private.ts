@@ -1,6 +1,7 @@
+import path from "path";
 import axios from "axios";
 import React from "react";
-//@ts-ignore
+import fs from "fs/promises";
 const { twi } = require("tw-to-css");
 import config, { BASE_URL } from "../config"; 
 import { render } from "@react-email/render";
@@ -39,19 +40,18 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
     }
 };
 
-
 /**
- * Sends an email using the configured email client settings.
- *
- * This method requires a valid private token to be set.
- *
+ * Sends an email using a secure sending endpoint.
+ * 
  * @param token - A string or null representing the authentication token. Must not be null.
- * @param data - An object adhering to the SendEmail interface, containing the following fields:
- *               from, to, subject, html, and optionally react and options.
- *
- * @returns A promise that resolves to the response from the server.
- *
- * @throws Will throw an error if there is an issue with the email sending process.
+ * @param data - An object adhering to the SendEmail interface, containing the following fields: 
+ *               'from', 'to', 'subject', 'html' or 'react', and optionally 'attachments', 'options', 'priority', and 'composeTailwindClasses'.
+ * 
+ * @returns A promise that resolves to the response data from the sending endpoint.
+ * 
+ * @throws Will throw an error if the token is null, if any of the required fields are missing, 
+ *         if the 'react' field is not a valid React element, if the 'attachments' field exceeds the maximum allowed size of 40 MB, 
+ *         or if an error occurs during the sending request.
  */
 export const sendEmail = async (token: string | null, data: Interfaces.SendEmail): Promise<any> => {
     if (token === null) throw customError(3000, "Invalid private token.");
@@ -74,6 +74,25 @@ export const sendEmail = async (token: string | null, data: Interfaces.SendEmail
         throw customError(1500, `An error occurred while rendering your React component. Details: ${error}`);
     }
     try {
+        let totalSize = 0;
+        if (data.attachments && Array.isArray(data.attachments)) {
+            const processedAttachments = await Promise.all(
+                data.attachments.map(async (attachment) => {
+                    if ((attachment.path && attachment.content) || (!attachment.path && !attachment.content)) throw customError(1500, "You must provide either 'path' or 'content', not both.");
+                    let contentBuffer;
+                    if (attachment.path) contentBuffer = await fs.readFile(path.resolve(attachment.path));
+                    else if (attachment.content) contentBuffer = attachment.content instanceof Buffer ? attachment.content : Buffer.from(attachment.content);
+                    totalSize += Buffer.byteLength(contentBuffer!);
+                    if (totalSize > 40 * 1024 * 1024) throw customError(1500, "Attachments exceed the maximum allowed size of 40 MB.");
+                    return {
+                        filename: attachment.filename || path.basename(attachment.path || ""),
+                        content: contentBuffer,
+                        cid: attachment.cid || attachment.filename
+                    } as Interfaces.Attachment;
+                })
+            );
+            data.attachments = processedAttachments;
+        }
         const response = await axios.post(`${BASE_URL}/v1/private/sender/sendEmail`, data, { headers: { "Authorization": token } });
         return response.data;
     } catch (error: any) {
