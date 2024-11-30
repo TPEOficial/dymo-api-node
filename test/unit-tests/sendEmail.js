@@ -5,7 +5,8 @@ exports.main = async (dymo) => {
         subject: "Test",
         html: "<div class=\"flex items-center justify-center bg-gray-100\">Test</div>",
         options: {
-            composeTailwindClasses: true
+            composeTailwindClasses: true,
+            waitToResponse: false
         }
     });
 };
