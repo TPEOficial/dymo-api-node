@@ -275,3 +275,5 @@ class DymoAPI {
         return await PublicAPI.newURLEncrypt(data);
     }
 }
+
+export default DymoAPI;
