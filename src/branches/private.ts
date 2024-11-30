@@ -2,7 +2,7 @@ import path from "path";
 import axios from "axios";
 import React from "react";
 import fs from "fs/promises";
-const { twi } = require("tw-to-css");
+import { twi } from "tw-to-css";
 import config, { BASE_URL } from "../config"; 
 import { render } from "@react-email/render";
 import * as Interfaces from "../lib/interfaces";
