@@ -45,7 +45,7 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
  * 
  * @param token - A string or null representing the authentication token. Must not be null.
  * @param data - An object adhering to the SendEmail interface, containing the following fields: 
- *               'from', 'to', 'subject', 'html' or 'react', and optionally 'attachments', 'options', 'priority', and 'composeTailwindClasses'.
+ *               'from', 'to', 'subject', 'html' or 'react', and optionally 'attachments', 'options', 'priority', 'waitToResponse', and 'composeTailwindClasses'.
  * 
  * @returns A promise that resolves to the response data from the sending endpoint.
  * 

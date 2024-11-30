@@ -175,6 +175,7 @@ class DymoAPI {
      * @param {React.ReactElement} [data.react] - The React component to be rendered as the email content.
      * @param {Object} [data.options] - Content configuration options.
      * @param {"high" | "normal" | "low" | undefined} [data.options.priority="normal"] - Email priority (default: normal).
+     * @param {boolean} [data.options.waitToResponse=true] - Wait until the email is sent (default: true).
      * @param {boolean} [data.options.composeTailwindClasses] - Whether to compose tailwind classes.
      * @param {Attachment[]} [data.attachments] - An array of attachments to be included in the email.
      * @param {string} data.attachments[].filename - The name of the attached file.
