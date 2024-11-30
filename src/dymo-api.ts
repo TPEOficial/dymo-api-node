@@ -59,7 +59,18 @@ class DymoAPI {
      *     local: true
      * });
      */
-    constructor({ rootApiKey = null, apiKey = null, local = false, serverEmailConfig = undefined }: { rootApiKey?: string | null; apiKey?: string | null; local?: boolean; serverEmailConfig?: ServerEmailConfig; }) {
+    constructor(
+        { 
+            rootApiKey = null,
+            apiKey = null,
+            local = false,
+            serverEmailConfig = undefined
+        }: { 
+            rootApiKey?: string | null;
+            apiKey?: string | null;
+            local?: boolean;
+            serverEmailConfig?: ServerEmailConfig; 
+        } = {}) {
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
         this.tokensResponse = null;
