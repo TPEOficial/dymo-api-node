@@ -11,7 +11,7 @@ export async function checkForUpdates(): Promise<void> {
         if (localVersion !== latestVersion) console.log(`[Dymo API] A new version of dymo-api is available: ${latestVersion}. You are using ${localVersion}. Consider updating.`);     
     } catch (error: any) {
         if (error.response) console.error("[Dymo API] Error fetching the latest version:", error.response.data);
-        else if (error.request)  console.error("[Dymo API] No response received from the server:", error.request);
+        else if (error.request) console.error("[Dymo API] No response received from the server:", error.request);
         else console.error("[Dymo API] An unknown error occurred:", error.message);
     }
 };

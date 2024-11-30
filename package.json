@@ -1,22 +1,20 @@
 {
   "name": "dymo-api",
-  "version": "1.0.61",
+  "version": "1.0.73",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.js",
   "module": "dist/esm/dymo-api.js",
   "types": "dist/types/dymo-api.d.ts",
+  "type": "module",
   "exports": {
     ".": {
-      "require": "./dist/cjs/dymo-api.js",
+      "require": "./dist/cjs/dymo-api.cjs",
       "import": "./dist/esm/dymo-api.js",
-      "default": "./dist/esm/dymo-api.js",
       "types": "./dist/types/dymo-api.d.ts"
     },
     "./*": {
-      "types": "./build/types/*.d.ts",
-      "require": "./build/cjs/*.js",
-      "import": "./build/esm/*.js",
-      "default": "./build/esm/*.js"
+      "require": "./dist/cjs/**/*.cjs",
+      "import": "./dist/esm/**/*.js"
     }
   },
   "files": [
@@ -25,7 +23,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build": "rimraf dist && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && node ./scripts/rename.js",
     "start": "ts-node src/dymo-api.ts",
     "prepublishOnly": "npm run build",
     "test": "node --max-old-space-size=4096 test/index.js"
