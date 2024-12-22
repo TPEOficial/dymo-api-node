@@ -37,7 +37,7 @@ class DymoAPI {
     private rootApiKey: string | null;
     private apiKey: string | null;
     private tokensResponse: TokensResponse | null;
-    private lastFetchTime: Date | null;
+    private tokensVerified: boolean | null;
     private serverEmailConfig?: ServerEmailConfig;
     private local: boolean;
 
@@ -74,7 +74,7 @@ class DymoAPI {
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
         this.tokensResponse = null;
-        this.lastFetchTime = null;
+        this.tokensVerified = false;
         this.serverEmailConfig = serverEmailConfig;
         this.local = rootApiKey ? local : false; // Only allow setting local if rootApiKey is defined.
         setBaseUrl(this.local);
@@ -98,8 +98,7 @@ class DymoAPI {
      * with the token retrieval process.
      */
     private async getTokens(): Promise<TokensResponse | undefined> {
-        const currentTime = new Date();
-        if (this.tokensResponse && this.lastFetchTime && (currentTime.getTime() - this.lastFetchTime.getTime()) < 5 * 60 * 1000) {
+        if (this.tokensResponse && this.tokensVerified) {
             console.log(`[${config.lib.name}] Using cached tokens response.`);
             return this.tokensResponse;
         };
@@ -114,7 +113,7 @@ class DymoAPI {
             if (tokens.root && response.data.root === false) throw customError(3000, "Invalid root token.");
             if (tokens.api && response.data.api === false) throw customError(3000, "Invalid API token.");
             this.tokensResponse = response.data;
-            this.lastFetchTime = currentTime;
+            this.tokensVerified = true;
             console.log(`[${config.lib.name}] Tokens initialized successfully.`);
             return this.tokensResponse;
         } catch (error: any) {
