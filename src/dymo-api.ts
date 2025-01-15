@@ -36,8 +36,8 @@ interface ServerEmailConfig {
 class DymoAPI {
     private rootApiKey: string | null;
     private apiKey: string | null;
-    private tokensResponse: TokensResponse | null;
-    private tokensVerified: boolean | null;
+    private static tokensResponse: TokensResponse | null;
+    private static tokensVerified: boolean | null;
     private serverEmailConfig?: ServerEmailConfig;
     private local: boolean;
 
@@ -73,13 +73,11 @@ class DymoAPI {
         } = {}) {
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
-        this.tokensResponse = null;
-        this.tokensVerified = false;
         this.serverEmailConfig = serverEmailConfig;
         this.local = rootApiKey ? local : false; // Only allow setting local if rootApiKey is defined.
         setBaseUrl(this.local);
         this.autoupdate();
-        this.initializeTokens(); // Calls the function to obtain tokens when creating the object.
+        if (!DymoAPI.tokensVerified) this.initializeTokens();
     }
 
     /**
@@ -97,25 +95,19 @@ class DymoAPI {
      * @throws Will throw an error if token validation fails, or if there is an issue
      * with the token retrieval process.
      */
-    private async getTokens(): Promise<TokensResponse | undefined> {
-        if (this.tokensResponse && this.tokensVerified) {
-            console.log(`[${config.lib.name}] Using cached tokens response.`);
-            return this.tokensResponse;
-        };
-
+    private static async getTokens(rootApiKey: string | null, apiKey: string | null): Promise<TokensResponse | undefined> {
         const tokens: Tokens = {};
-        if (this.rootApiKey) tokens.root = `Bearer ${this.rootApiKey}`;
-        if (this.apiKey) tokens.api = `Bearer ${this.apiKey}`;
-
+        if (rootApiKey) tokens.root = `Bearer ${rootApiKey}`;
+        if (apiKey) tokens.api = `Bearer ${apiKey}`;
         try {
             if (Object.keys(tokens).length === 0) return;
             const response = await axios.post<TokensResponse>(`${BASE_URL}/v1/dvr/tokens`, { tokens });
             if (tokens.root && response.data.root === false) throw customError(3000, "Invalid root token.");
             if (tokens.api && response.data.api === false) throw customError(3000, "Invalid API token.");
-            this.tokensResponse = response.data;
-            this.tokensVerified = true;
+            DymoAPI.tokensResponse = response.data;
+            DymoAPI.tokensVerified = true;
             console.log(`[${config.lib.name}] Tokens initialized successfully.`);
-            return this.tokensResponse;
+            return DymoAPI.tokensResponse;
         } catch (error: any) {
             throw customError(5000, error.message);
         }
@@ -132,7 +124,8 @@ class DymoAPI {
      */
     private async initializeTokens() {
         try {
-            await this.getTokens();
+            if (!DymoAPI.tokensVerified) await DymoAPI.getTokens(this.rootApiKey, this.apiKey);
+            else console.log(`[${config.lib.name}] Tokens already verified.`);
         } catch (error: any) {
             throw customError(5000, `Error initializing tokens: ${error.message}`);
         }

@@ -12,8 +12,9 @@ const customError = (code: number, message: string): Error => {
 };
 
 const convertTailwindToInlineCss = (htmlContent: string): string => {
-    return htmlContent.replace(/class="([^"]+)"/g, (match, classList) => {
-        return match.replace("class", "style").replace(classList, twi(classList, { minify: true, merge: true }));
+    return htmlContent.replace(/class="([^"]+)"( style="([^"]+)")?/g, (match, classList, _, existingStyle) => {
+        const compiledStyles = twi(classList, { minify: true, merge: true });
+        return match.replace(/class="[^"]+"/, "").replace(/ style="[^"]+"/, "").concat(` style="${existingStyle ? `${existingStyle.trim().slice(0, -1)}; ${compiledStyles}` : compiledStyles}"`);
     });
 };
 

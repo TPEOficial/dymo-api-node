@@ -43,6 +43,8 @@ export interface SendEmail {
     options?: { 
         priority?: "high" | "normal" | "low" | undefined;
         composeTailwindClasses?: boolean;
+        compileToCssSafe?: boolean;
+        onlyVerifiedEmails?: boolean;
     };
     attachments?: Attachment[];
 }
