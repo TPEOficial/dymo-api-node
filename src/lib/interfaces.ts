@@ -12,6 +12,8 @@ interface CreditCardData {
     cvv?: string | number;
 };
 
+export type VerifyPlugins = "compromiseDetector" | "nsfw" | "reputation" | "torNetwork" | "typosquatting" | "urlShortener";
+
 export interface Validator {
     email?: string;
     phone?: PhoneData;
@@ -19,6 +21,7 @@ export interface Validator {
     creditCard?: string | CreditCardData;
     ip?: string;
     wallet?: string;
+    plugins?: VerifyPlugins[];
 };
 
 export interface SRNG {
