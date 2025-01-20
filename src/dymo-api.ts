@@ -115,7 +115,8 @@ class DymoAPI {
             console.log(`[${config.lib.name}] Tokens initialized successfully.`);
             return DymoAPI.tokensResponse;
         } catch (error: any) {
-            throw customError(5000, error.message);
+            console.error(error.message);
+            throw new Error(error.message);
         }
     }
 
@@ -132,7 +133,7 @@ class DymoAPI {
         try {
             await this.getTokens();
         } catch (error: any) {
-            throw customError(5000, `Error initializing tokens: ${error.message}`);
+            console.error(`Error initializing tokens: ${error.message}`);
         }
     }
 
@@ -149,7 +150,7 @@ class DymoAPI {
         try {
             await checkForUpdates();
         } catch (error: any) {
-            throw customError(5000, `Error checking the latest version in npmjs: ${error.message}`);
+            console.error(`Error checking the latest version in npmjs: ${error.message}`);
         }
     }
 
@@ -193,7 +194,7 @@ class DymoAPI {
      * @throws Will throw an error if there is an issue with the email sending process.
      */
     async sendEmail(data: any): Promise<any> {
-        if (!this.serverEmailConfig && !this.rootApiKey) throw customError(5000, "You must configure the email client settings.");
+        if (!this.serverEmailConfig && !this.rootApiKey) console.error("You must configure the email client settings.");
         return await PrivateAPI.sendEmail(this.rootApiKey || this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
     }
 
