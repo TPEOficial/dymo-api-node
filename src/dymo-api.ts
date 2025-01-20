@@ -279,21 +279,6 @@ class DymoAPI {
     async isValidPwd(data: Interfaces.IsValidPwdData): Promise<Interfaces.PasswordValidationResult> {
         return await PublicAPI.isValidPwd(data);
     }
-
-    /**
-     * Encrypts a URL using the configured encryption settings.
-     *
-     * This method requires the URL to be provided in the data object.
-     * If the URL is not provided, it will throw an error.
-     *
-     * @param {Object} data - The data to be sent.
-     * @param {string} data.url - The URL to be encrypted.
-     * @returns {Promise<Interfaces.UrlResponse>} A promise that resolves to the response from the server.
-     * @throws Will throw an error if there is an issue with the URL encryption process.
-     */
-    async newURLEncrypt(data: Interfaces.NewURLEncryptData): Promise<Interfaces.UrlResponse> {
-        return await PublicAPI.newURLEncrypt(data);
-    }
 }
 
 export default DymoAPI;

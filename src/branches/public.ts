@@ -60,14 +60,3 @@ export const isValidPwd = async (data: Interfaces.IsValidPwdData): Promise<any> 
         throw customError(5000, error.response?.data?.message || error.message);
     }
 };
-
-export const newURLEncrypt = async (data: Interfaces.NewURLEncryptData): Promise<any> => {
-    const { url } = data;
-    if (url === undefined || (!url.startsWith("https://") && !url.startsWith("http://"))) throw customError(1500, "You must provide a valid url.");
-    try {
-        const response = await axios.get(`${BASE_URL}/v1/public/url-encrypt`, { params: data });
-        return response.data;
-    } catch (error: any) {
-        throw customError(5000, error.response?.data?.message || error.message);
-    }
-};

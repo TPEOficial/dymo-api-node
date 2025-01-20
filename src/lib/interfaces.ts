@@ -69,10 +69,6 @@ export interface IsValidPwdData {
     max?: number;
 };
 
-export interface NewURLEncryptData {
-    url?: string;
-};
-
 export interface SRNComponent {
     integer: number;
     float: number;
@@ -84,20 +80,20 @@ export interface SRNSummary {
 }
 
 export interface CountryPrayerTimes {
-    country: String;
+    country: string;
     prayerTimesByTimezone: {
-        timezone: String;
+        timezone: string;
         prayerTimes: {
-            coordinates: String;
-            date: String;
-            calculationParameters: String;
-            fajr: String;
-            sunrise: String;
-            dhuhr: String;
-            asr: String;
-            sunset: String;
-            maghrib: String;
-            isha: String;
+            coordinates: string;
+            date: string;
+            calculationParameters: string;
+            fajr: string;
+            sunrise: string;
+            dhuhr: string;
+            asr: string;
+            sunset: string;
+            maghrib: string;
+            isha: string;
         };
     }[];
 };
@@ -167,12 +163,6 @@ export interface PasswordValidationResult {
     details: ValidationDetail[];
 }
 
-export interface UrlResponse {
-    original: string;
-    code: string;
-    encrypt: string;
-}
-
 export interface DataValidationAnalysis {
     email: {
         valid: boolean;
@@ -229,10 +219,10 @@ export interface DataValidationAnalysis {
         city: string;
         district: string;
         zipCode: string;
-        lat: Number;
-        lon: Number;
+        lat: number;
+        lon: number;
         timezone: string;
-        offset: Number;
+        offset: number;
         currency: string;
         isp: string;
         org: string;
@@ -250,4 +240,4 @@ export interface DataValidationAnalysis {
         type: "Bitcoin" | "Bitcoin (Bech32)" | "Ethereum" | "Litecoin" | "Cardano" | "Binance Smart Chain";
         plugins: {};
     };
-}                             
+}
