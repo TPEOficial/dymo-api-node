@@ -1,32 +1,12 @@
 import axios from "axios";
 import config, { BASE_URL } from "../config";
+import * as Interfaces from "../lib/interfaces";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
 };
 
-interface PrayerTimesData {
-    lat?: number;
-    lon?: number;
-};
-
-interface InputSatinizerData {
-    input?: string;
-};
-
-interface IsValidPwdData {
-    email?: string;
-    password?: string;
-    bannedWords?: string | string[];
-    min?: number;
-    max?: number;
-};
-
-interface NewURLEncryptData {
-    url?: string;
-};
-
-export const getPrayerTimes = async (data: PrayerTimesData): Promise<any> => {
+export const getPrayerTimes = async (data: Interfaces.PrayerTimesData): Promise<any> => {
     const { lat, lon } = data;
     if (lat === undefined || lon === undefined) throw customError(1000, "You must provide a latitude and longitude.");
     try {
@@ -37,7 +17,7 @@ export const getPrayerTimes = async (data: PrayerTimesData): Promise<any> => {
     }
 };
 
-export const satinizer = async (data: InputSatinizerData): Promise<any> => {
+export const satinizer = async (data: Interfaces.InputSatinizerData): Promise<any> => {
     const { input } = data;
     if (input === undefined) throw customError(1000, "You must specify at least the input.");
     try {
@@ -48,7 +28,7 @@ export const satinizer = async (data: InputSatinizerData): Promise<any> => {
     }
 };
 
-export const isValidPwd = async (data: IsValidPwdData): Promise<any> => {
+export const isValidPwd = async (data: Interfaces.IsValidPwdData): Promise<any> => {
     let { email, password, bannedWords, min, max } = data;
     if (password === undefined) throw customError(1000, "You must specify at least the password.");
     const params: { [key: string]: any } = { password: encodeURIComponent(password) };
@@ -60,10 +40,10 @@ export const isValidPwd = async (data: IsValidPwdData): Promise<any> => {
 
     if (bannedWords) {
         if (typeof bannedWords === "string") bannedWords = bannedWords.slice(1, -1).trim().split(",").map(item => item.trim());
-        
-        if (!Array.isArray(bannedWords) || bannedWords.length > 10) 
+
+        if (!Array.isArray(bannedWords) || bannedWords.length > 10)
             throw customError(1500, "If you provide a list of banned words; the list may not exceed 10 words and must be of array type.");
-        if (!bannedWords.every(word => typeof word === "string") || new Set(bannedWords).size !== bannedWords.length) 
+        if (!bannedWords.every(word => typeof word === "string") || new Set(bannedWords).size !== bannedWords.length)
             throw customError(1500, "If you provide a list of banned words; all elements must be non-repeated strings.");
         params.bannedWords = bannedWords;
     }
@@ -81,7 +61,7 @@ export const isValidPwd = async (data: IsValidPwdData): Promise<any> => {
     }
 };
 
-export const newURLEncrypt = async (data: NewURLEncryptData): Promise<any> => {
+export const newURLEncrypt = async (data: Interfaces.NewURLEncryptData): Promise<any> => {
     const { url } = data;
     if (url === undefined || (!url.startsWith("https://") && !url.startsWith("http://"))) throw customError(1500, "You must provide a valid url.");
     try {
