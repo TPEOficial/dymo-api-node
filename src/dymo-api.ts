@@ -4,7 +4,6 @@ import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import config, { BASE_URL, setBaseUrl } from "./config";
 import { checkForUpdates } from "./services/autoupdate";
-// import { SRNG } from "./lib/interfaces";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
@@ -164,10 +163,17 @@ class DymoAPI {
      * If neither is set, it will throw an error.
      *
      * @param {Object} data - The data to be validated.
-     * @returns {Promise<Object>} A promise that resolves to the response from the server.
+     * @param {string} [data.email] - Optional email address to be validated.
+     * @param {Interfaces.PhoneData} [data.phone] - Optional phone number data to be validated.
+     * @param {string} [data.domain] - Optional domain name to be validated.
+     * @param {string|Interfaces.CreditCardData} [data.creditCard] - Optional credit card number or data to be validated.
+     * @param {string} [data.ip] - Optional IP address to be validated.
+     * @param {string} [data.wallet] - Optional wallet address to be validated.
+     * @param {Interfaces.VerifyPlugins[]} [data.plugins] - Optional array of verification plugins to be used.
+     * @returns {Promise<Interfaces.DataValidationAnalysis>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the validation process.
      */
-    async isValidData(data: any): Promise<any> {
+    async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
         return await PrivateAPI.isValidData(this.rootApiKey || this.apiKey, data);
     }
 
@@ -192,10 +198,10 @@ class DymoAPI {
      * @param {string} [data.attachments[].path] - The path or URL of the attached file. Either this or `content` must be provided.
      * @param {Buffer} [data.attachments[].content] - The content of the attached file as a Buffer. Either this or `path` must be provided.
      * @param {string} [data.attachments[].cid] - The CID (Content-ID) of the attached file, used for inline images.
-     * @returns {Promise<Object>} A promise that resolves to the response from the server.
+     * @returns {Promise<Interfaces.EmailStatus>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the email sending process.
      */
-    async sendEmail(data: any): Promise<any> {
+    async sendEmail(data: any): Promise<Interfaces.EmailStatus> {
         if (!this.serverEmailConfig && !this.rootApiKey) console.error("You must configure the email client settings.");
         return await PrivateAPI.sendEmail(this.rootApiKey || this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
     }
@@ -209,10 +215,11 @@ class DymoAPI {
      * @param {Interfaces.SRNG} data - The data to be sent.
      * @param {number} data.min - The minimum value of the range.
      * @param {number} data.max - The maximum value of the range.
-     * @returns {Promise<Object>} A promise that resolves to the response from the server.
+     * @param {number} [data.quantity] - The number of random values to generate. Defaults to 1 if not provided.
+     * @returns {Promise<Interfaces.SRNSummary>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the random number generation process.
      */
-    async getRandom(data: Interfaces.SRNG): Promise<any> {
+    async getRandom(data: Interfaces.SRNG): Promise<Interfaces.SRNSummary> {
         return await PrivateAPI.getRandom(this.rootApiKey || this.apiKey, data);
     }
 
@@ -226,10 +233,10 @@ class DymoAPI {
      * @param {Object} data - The data to be sent.
      * @param {number} data.lat - The latitude of the location.
      * @param {number} data.lon - The longitude of the location.
-     * @returns {Promise<Object>} A promise that resolves to the response from the server.
+     * @returns {Promise<Interfaces.CountryPrayerTimes | { error: string }>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the prayer times retrieval process.
      */
-    async getPrayerTimes(data: Interfaces.PrayerTimesData): Promise<any> {
+    async getPrayerTimes(data: Interfaces.PrayerTimesData): Promise<Interfaces.CountryPrayerTimes | { error: string }> {
         return await PublicAPI.getPrayerTimes(data);
     }
 
@@ -239,10 +246,10 @@ class DymoAPI {
      *
      * @param {Object} data - The data to be sent.
      * @param {string} data.input - The input to be satinized.
-     * @returns {Promise<Object>} A promise that resolves to the response from the server.
+     * @returns {Promise<Interfaces.SatinizedInputAnalysis>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the satinization process.
      */
-    async satinizer(data: Interfaces.InputSatinizerData): Promise<any> {
+    async satinizer(data: Interfaces.InputSatinizerData): Promise<Interfaces.SatinizedInputAnalysis> {
         return await PublicAPI.satinizer(data);
     }
 
@@ -264,12 +271,12 @@ class DymoAPI {
      * @param {number} [data.min] - Minimum length of the password. Defaults to 8 if not provided.
      * @param {number} [data.max] - Maximum length of the password. Defaults to 32 if not provided.
      * @param {string} [data.email] - Optional email associated with the password.
-     * @param {string} [data.password] - The password to be validated.
+     * @param {string} data.password - The password to be validated.
      * @param {string | string[]} [data.bannedWords] - The list of banned words that the password must not contain.
-     * @returns {Promise<Object>} A promise that resolves to the response from the server.
+     * @returns {Promise<Interfaces.PasswordValidationResult>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the password validation process.
      */
-    async isValidPwd(data: Interfaces.IsValidPwdData): Promise<any> {
+    async isValidPwd(data: Interfaces.IsValidPwdData): Promise<Interfaces.PasswordValidationResult> {
         return await PublicAPI.isValidPwd(data);
     }
 
@@ -281,10 +288,10 @@ class DymoAPI {
      *
      * @param {Object} data - The data to be sent.
      * @param {string} data.url - The URL to be encrypted.
-     * @returns {Promise<Object>} A promise that resolves to the response from the server.
+     * @returns {Promise<Interfaces.UrlResponse>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the URL encryption process.
      */
-    async newURLEncrypt(data: Interfaces.NewURLEncryptData): Promise<any> {
+    async newURLEncrypt(data: Interfaces.NewURLEncryptData): Promise<Interfaces.UrlResponse> {
         return await PublicAPI.newURLEncrypt(data);
     }
 }
