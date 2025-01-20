@@ -51,3 +51,24 @@ export interface SendEmail {
     };
     attachments?: Attachment[];
 }
+
+export interface PrayerTimesData {
+    lat?: number;
+    lon?: number;
+};
+
+export interface InputSatinizerData {
+    input?: string;
+};
+
+export interface IsValidPwdData {
+    email?: string;
+    password?: string;
+    bannedWords?: string | string[];
+    min?: number;
+    max?: number;
+};
+
+export interface NewURLEncryptData {
+    url?: string;
+};
