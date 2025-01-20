@@ -176,7 +176,14 @@ export interface DataValidationAnalysis {
         customTLD: boolean;
         domain: string;
         roleAccount: boolean;
-        plugins: {};
+        plugins: {
+            compromiseDetector?: boolean;
+            nsfw?: boolean;
+            reputation?: boolean;
+            torNetwork?: boolean;
+            typosquatting?: boolean;
+            urlShortener?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
+        };
     };
     phone: {
         valid: boolean;
@@ -194,7 +201,14 @@ export interface DataValidationAnalysis {
         freeSubdomain: boolean;
         customTLD: boolean;
         domain: string;
-        plugins: {};
+        plugins: {
+            compromiseDetector?: boolean;
+            nsfw?: boolean;
+            reputation?: boolean;
+            torNetwork?: boolean;
+            typosquatting?: boolean;
+            urlShortener?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
+        };
     };
     creditCard: {
         valid: boolean;
@@ -238,6 +252,8 @@ export interface DataValidationAnalysis {
         fraud: boolean;
         wallet: string;
         type: "Bitcoin" | "Bitcoin (Bech32)" | "Ethereum" | "Litecoin" | "Cardano" | "Binance Smart Chain";
-        plugins: {};
+        plugins: {
+            torNetwork?: boolean;
+        };
     };
 }
