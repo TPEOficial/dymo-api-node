@@ -1,8 +1,10 @@
 import axios from "axios";
+import * as Interfaces from "./lib/interfaces";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import config, { BASE_URL, setBaseUrl } from "./config";
 import { checkForUpdates } from "./services/autoupdate";
+// import { SRNG } from "./lib/interfaces";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
@@ -90,7 +92,7 @@ class DymoAPI {
      * The method also handles validation of root and API tokens, throwing errors if
      * any of the tokens are invalid. Cached tokens are considered valid for 5 minutes.
      *
-     * @returns {Promise<Object|undefined>} A promise that resolves to the tokens response
+     * @returns {Promise<TokensResponse|undefined>} A promise that resolves to the tokens response
      * if successful, or undefined if no tokens are available.
      * @throws Will throw an error if token validation fails, or if there is an issue
      * with the token retrieval process.
@@ -129,7 +131,7 @@ class DymoAPI {
      * @throws Will throw an error if there is an issue with the token retrieval
      * process.
      */
-    private async initializeTokens() {
+    private async initializeTokens(): Promise<void> {
         try {
             await this.getTokens();
         } catch (error: any) {
@@ -146,7 +148,7 @@ class DymoAPI {
      * @throws Will throw an error if there is an issue with the update check
      * process.
      */
-    private async autoupdate() {
+    private async autoupdate(): Promise<void> {
         try {
             await checkForUpdates();
         } catch (error: any) {
@@ -204,13 +206,13 @@ class DymoAPI {
      * This method requires either the root API key or the API key to be set.
      * If neither is set, it will throw an error.
      *
-     * @param {Object} data - The data to be sent.
+     * @param {Interfaces.SRNG} data - The data to be sent.
      * @param {number} data.min - The minimum value of the range.
      * @param {number} data.max - The maximum value of the range.
      * @returns {Promise<Object>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the random number generation process.
      */
-    async getRandom(data: any): Promise<any> {
+    async getRandom(data: Interfaces.SRNG): Promise<any> {
         return await PrivateAPI.getRandom(this.rootApiKey || this.apiKey, data);
     }
 
@@ -227,7 +229,7 @@ class DymoAPI {
      * @returns {Promise<Object>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the prayer times retrieval process.
      */
-    async getPrayerTimes(data: any): Promise<any> {
+    async getPrayerTimes(data: Interfaces.PrayerTimesData): Promise<any> {
         return await PublicAPI.getPrayerTimes(data);
     }
 
@@ -240,7 +242,7 @@ class DymoAPI {
      * @returns {Promise<Object>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the satinization process.
      */
-    async satinizer(data: any): Promise<any> {
+    async satinizer(data: Interfaces.InputSatinizerData): Promise<any> {
         return await PublicAPI.satinizer(data);
     }
 
@@ -259,12 +261,15 @@ class DymoAPI {
      *  - The password must not contain any of the given banned words.
      *
      * @param {Object} data - The data to be sent.
-     * @param {string} data.password - The password to be validated.
-     * @param {string[]} [data.bannedWords] - The list of banned words that the password must not contain.
+     * @param {number} [data.min] - Minimum length of the password. Defaults to 8 if not provided.
+     * @param {number} [data.max] - Maximum length of the password. Defaults to 32 if not provided.
+     * @param {string} [data.email] - Optional email associated with the password.
+     * @param {string} [data.password] - The password to be validated.
+     * @param {string | string[]} [data.bannedWords] - The list of banned words that the password must not contain.
      * @returns {Promise<Object>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the password validation process.
      */
-    async isValidPwd(data: any): Promise<any> {
+    async isValidPwd(data: Interfaces.IsValidPwdData): Promise<any> {
         return await PublicAPI.isValidPwd(data);
     }
 
@@ -279,7 +284,7 @@ class DymoAPI {
      * @returns {Promise<Object>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the URL encryption process.
      */
-    async newURLEncrypt(data: any): Promise<any> {
+    async newURLEncrypt(data: Interfaces.NewURLEncryptData): Promise<any> {
         return await PublicAPI.newURLEncrypt(data);
     }
 }
