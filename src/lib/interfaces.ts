@@ -179,10 +179,10 @@ export interface DataValidationAnalysis {
         plugins: {
             compromiseDetector?: boolean;
             nsfw?: boolean;
-            reputation?: boolean;
+            reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
             torNetwork?: boolean;
             typosquatting?: boolean;
-            urlShortener?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
+            urlShortener?: boolean;
         };
     };
     phone: {
@@ -204,10 +204,10 @@ export interface DataValidationAnalysis {
         plugins: {
             compromiseDetector?: boolean;
             nsfw?: boolean;
-            reputation?: boolean;
+            reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
             torNetwork?: boolean;
             typosquatting?: boolean;
-            urlShortener?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
+            urlShortener?: boolean;
         };
     };
     creditCard: {
