@@ -134,7 +134,7 @@ class DymoAPI {
         try {
             await this.getTokens();
         } catch (error: any) {
-            console.error(`Error initializing tokens: ${error.message}`);
+            console.error(`[${config.lib.name}] Error initializing tokens: ${error.message}`);
         }
     }
 
