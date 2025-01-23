@@ -181,7 +181,7 @@ export interface DataValidationAnalysis {
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
             torNetwork?: boolean;
-            typosquatting?: boolean;
+            typosquatting?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
             urlShortener?: boolean;
         };
     };
@@ -206,7 +206,7 @@ export interface DataValidationAnalysis {
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
             torNetwork?: boolean;
-            typosquatting?: boolean;
+            typosquatting?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
             urlShortener?: boolean;
         };
     };
