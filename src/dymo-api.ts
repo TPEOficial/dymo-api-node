@@ -19,25 +19,10 @@ interface Tokens {
     api?: string;
 };
 
-interface ServerEmailConfig {
-    host: string;
-    port: number;
-    secure: boolean;
-    auth: {
-        user: string;
-        pass: string;
-    };
-    dkim?: {
-        domainName: string;
-        keySelector: string;
-        privateKey: string;
-    };
-};
-
 class DymoAPI {
     private rootApiKey: string | null;
     private apiKey: string | null;
-    private serverEmailConfig?: ServerEmailConfig;
+    private serverEmailConfig?: Interfaces.ServerEmailConfig;
     private local: boolean;
     private static tokensResponse: TokensResponse | null = null;
     private static tokensVerified: boolean | null = false;
@@ -70,7 +55,7 @@ class DymoAPI {
             rootApiKey?: string | null;
             apiKey?: string | null;
             local?: boolean;
-            serverEmailConfig?: ServerEmailConfig;
+            serverEmailConfig?: Interfaces.ServerEmailConfig;
         } = {}) {
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
@@ -172,6 +157,8 @@ class DymoAPI {
      * @param {Interfaces.VerifyPlugins[]} [data.plugins] - Optional array of verification plugins to be used.
      * @returns {Promise<Interfaces.DataValidationAnalysis>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the validation process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
      */
     async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
         return await PrivateAPI.isValidData(this.rootApiKey || this.apiKey, data);
@@ -200,8 +187,10 @@ class DymoAPI {
      * @param {string} [data.attachments[].cid] - The CID (Content-ID) of the attached file, used for inline images.
      * @returns {Promise<Interfaces.EmailStatus>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the email sending process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/sender-send-email/getting-started)
      */
-    async sendEmail(data: any): Promise<Interfaces.EmailStatus> {
+    async sendEmail(data: Interfaces.SendEmail): Promise<Interfaces.EmailStatus> {
         if (!this.serverEmailConfig && !this.rootApiKey) console.error(`[${config.lib.name}] You must configure the email client settings.`);
         return await PrivateAPI.sendEmail(this.rootApiKey || this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
     }
@@ -218,6 +207,8 @@ class DymoAPI {
      * @param {number} [data.quantity] - The number of random values to generate. Defaults to 1 if not provided.
      * @returns {Promise<Interfaces.SRNSummary>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the random number generation process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/secure-random-number-generator)
      */
     async getRandom(data: Interfaces.SRNG): Promise<Interfaces.SRNSummary> {
         return await PrivateAPI.getRandom(this.rootApiKey || this.apiKey, data);
@@ -235,6 +226,8 @@ class DymoAPI {
      * @param {number} data.lon - The longitude of the location.
      * @returns {Promise<Interfaces.CountryPrayerTimes | { error: string }>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the prayer times retrieval process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/prayertimes)
      */
     async getPrayerTimes(data: Interfaces.PrayerTimesData): Promise<Interfaces.CountryPrayerTimes | { error: string }> {
         return await PublicAPI.getPrayerTimes(data);
@@ -248,6 +241,8 @@ class DymoAPI {
      * @param {string} data.input - The input to be satinized.
      * @returns {Promise<Interfaces.SatinizedInputAnalysis>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the satinization process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/input-satinizer)
      */
     async satinizer(data: Interfaces.InputSatinizerData): Promise<Interfaces.SatinizedInputAnalysis> {
         return await PublicAPI.satinizer(data);
@@ -275,6 +270,8 @@ class DymoAPI {
      * @param {string | string[]} [data.bannedWords] - The list of banned words that the password must not contain.
      * @returns {Promise<Interfaces.PasswordValidationResult>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the password validation process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/password-validator)
      */
     async isValidPwd(data: Interfaces.IsValidPwdData): Promise<Interfaces.PasswordValidationResult> {
         return await PublicAPI.isValidPwd(data);
