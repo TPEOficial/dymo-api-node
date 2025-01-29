@@ -37,6 +37,21 @@ export type Attachment = {
     cid?: string;
 };
 
+export interface ServerEmailConfig {
+    host: string;
+    port: number;
+    secure: boolean;
+    auth: {
+        user: string;
+        pass: string;
+    };
+    dkim?: {
+        domainName: string;
+        keySelector: string;
+        privateKey: string;
+    };
+};
+
 export interface SendEmail {
     from: string;
     to: string;

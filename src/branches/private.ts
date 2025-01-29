@@ -3,7 +3,7 @@ import axios from "axios";
 import React from "react";
 import fs from "fs/promises";
 import { twi } from "tw-to-css";
-import config, { BASE_URL } from "../config"; 
+import config, { BASE_URL } from "../config";
 import { render } from "@react-email/render";
 import * as Interfaces from "../lib/interfaces";
 
@@ -54,7 +54,7 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
  *         if the 'react' field is not a valid React element, if the 'attachments' field exceeds the maximum allowed size of 40 MB, 
  *         or if an error occurs during the sending request.
  */
-export const sendEmail = async (token: string | null, data: Interfaces.SendEmail): Promise<any> => {
+export const sendEmail = async (token: string | null, data: Interfaces.SendEmail & { serverEmailConfig: Interfaces.ServerEmailConfig | undefined }): Promise<any> => {
     if (token === null) throw customError(3000, "Invalid private token.");
     if (!data.from) throw customError(1500, "You must provide an email address from which the following will be sent.");
     if (!data.to) throw customError(1500, "You must provide an email to be sent to.");
