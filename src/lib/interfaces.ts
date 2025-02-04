@@ -192,6 +192,7 @@ export interface DataValidationAnalysis {
         domain: string;
         roleAccount: boolean;
         plugins: {
+            blocklist?: boolean;
             compromiseDetector?: boolean;
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
@@ -208,7 +209,9 @@ export interface DataValidationAnalysis {
         number: string;
         country: string;
         countryCode: string;
-        plugins: {};
+        plugins: {
+            blocklist?: boolean;
+        };
     };
     domain: {
         valid: boolean;
@@ -217,6 +220,7 @@ export interface DataValidationAnalysis {
         customTLD: boolean;
         domain: string;
         plugins: {
+            blocklist?: boolean;
             compromiseDetector?: boolean;
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
@@ -231,7 +235,9 @@ export interface DataValidationAnalysis {
         test: boolean;
         type: string;
         creditCard: string;
-        plugins: {};
+        plugins: {
+            blocklist?: boolean;
+        };
     };
     ip: {
         valid: boolean;
@@ -260,7 +266,9 @@ export interface DataValidationAnalysis {
         mobile: boolean;
         proxy: boolean;
         hosting: boolean;
-        plugins: {};
+        plugins: {
+            blocklist?: boolean;
+        };
     };
     wallet: {
         valid: boolean;
@@ -268,6 +276,7 @@ export interface DataValidationAnalysis {
         wallet: string;
         type: "Bitcoin" | "Bitcoin (Bech32)" | "Ethereum" | "Litecoin" | "Cardano" | "Binance Smart Chain";
         plugins: {
+            blocklist?: boolean;
             torNetwork?: boolean;
         };
     };
