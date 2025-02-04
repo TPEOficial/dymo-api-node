@@ -12,7 +12,7 @@ export interface CreditCardData {
     cvv?: string | number;
 };
 
-export type VerifyPlugins = "compromiseDetector" | "nsfw" | "reputation" | "torNetwork" | "typosquatting" | "urlShortener";
+export type VerifyPlugins = "blocklist" | "compromiseDetector" | "nsfw" | "reputation" | "torNetwork" | "typosquatting" | "urlShortener";
 
 export interface Validator {
     email?: string;
