@@ -9,23 +9,11 @@ const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
 };
 
-interface TokensResponse {
-    root: boolean;
-    api: boolean;
-};
-
-interface Tokens {
-    root?: string;
-    api?: string;
-};
-
 class DymoAPI {
     private rootApiKey: string | null;
     private apiKey: string | null;
     private serverEmailConfig?: Interfaces.ServerEmailConfig;
     private local: boolean;
-    private static tokensResponse: TokensResponse | null = null;
-    private static tokensVerified: boolean | null = false;
 
     /**
      * @param {Object} options - Options to create the DymoAPI instance.
@@ -63,64 +51,6 @@ class DymoAPI {
         this.local = rootApiKey ? local : false; // Only allow setting local if rootApiKey is defined.
         setBaseUrl(this.local);
         this.autoupdate();
-        this.initializeTokens(); // Calls the function to obtain tokens when creating the object.
-    }
-
-    /**
-     * Retrieves and caches authentication tokens.
-     *
-     * This method checks if cached tokens are available and valid. If so, it returns
-     * the cached tokens. Otherwise, it generates new tokens using the provided API keys
-     * and caches them. The tokens are fetched from the server using a POST request.
-     *
-     * The method also handles validation of root and API tokens, throwing errors if
-     * any of the tokens are invalid. Cached tokens are considered valid for 5 minutes.
-     *
-     * @returns {Promise<TokensResponse|undefined>} A promise that resolves to the tokens response
-     * if successful, or undefined if no tokens are available.
-     * @throws Will throw an error if token validation fails, or if there is an issue
-     * with the token retrieval process.
-     */
-    private async getTokens(): Promise<TokensResponse | undefined> {
-        if (DymoAPI.tokensResponse && DymoAPI.tokensVerified) {
-            console.log(`[${config.lib.name}] Using cached tokens response.`);
-            return DymoAPI.tokensResponse;
-        }
-
-        const tokens: Tokens = {};
-        if (this.rootApiKey) tokens.root = `Bearer ${this.rootApiKey}`;
-        if (this.apiKey) tokens.api = `Bearer ${this.apiKey}`;
-
-        try {
-            if (Object.keys(tokens).length === 0) return;
-            const response = await axios.post<TokensResponse>(`${BASE_URL}/v1/dvr/tokens`, { tokens });
-            if (tokens.root && response.data.root === false) throw customError(3000, "Invalid root token.");
-            if (tokens.api && response.data.api === false) throw customError(3000, "Invalid API token.");
-            DymoAPI.tokensResponse = response.data;
-            DymoAPI.tokensVerified = true;
-            console.log(`[${config.lib.name}] Tokens initialized successfully.`);
-            return DymoAPI.tokensResponse;
-        } catch (error: any) {
-            console.error(`[${config.lib.name}] ${error.message}`);
-            throw new Error(`[${config.lib.name}] ${error.message}`);
-        }
-    }
-
-    /**
-     * Initializes the tokens response by calling getTokens().
-     *
-     * This method is called in the constructor and will throw an error if the
-     * initialization process fails.
-     *
-     * @throws Will throw an error if there is an issue with the token retrieval
-     * process.
-     */
-    private async initializeTokens(): Promise<void> {
-        try {
-            await this.getTokens();
-        } catch (error: any) {
-            console.error(`[${config.lib.name}] Error initializing tokens: ${error.message}`);
-        }
     }
 
     /**
