@@ -52,20 +52,21 @@ export interface ServerEmailConfig {
     };
 };
 
-export interface SendEmail {
+export type SendEmail = {
     from: string;
     to: string;
     subject: string;
-    html?: string;
-    react?: never;
+    attachments?: Attachment[];
     options?: {
-        priority?: "high" | "normal" | "low" | undefined;
+        priority?: "high" | "normal" | "low";
         composeTailwindClasses?: boolean;
         compileToCssSafe?: boolean;
         onlyVerifiedEmails?: boolean;
     };
-    attachments?: Attachment[];
-}
+} & (
+    { html: string; react?: never; } |
+    { react: React.ReactNode; html?: never; }
+);
 
 export interface PrayerTimesData {
     lat?: number;
