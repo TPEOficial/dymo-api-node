@@ -1,10 +1,7 @@
-import axios from "axios";
 import * as Interfaces from "./lib/interfaces";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import config, { BASE_URL, setBaseUrl } from "./config";
-import { checkForUpdates } from "./services/autoupdate";
-
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
 };
@@ -13,13 +10,13 @@ class DymoAPI {
     private rootApiKey: string | null;
     private apiKey: string | null;
     private serverEmailConfig?: Interfaces.ServerEmailConfig;
-    private local: boolean;
+    private baseUrl: string;
 
     /**
      * @param {Object} options - Options to create the DymoAPI instance.
      * @param {string} [options.rootApiKey] - The root API key.
      * @param {string} [options.apiKey] - The API key.
-     * @param {boolean} [options.local] - Whether to use a local server instead of the cloud server.
+     * @param {string} [options.baseUrl] - Whether to use a local server instead of the cloud server.
      * @param {Object} [options.serverEmailConfig] - The server email config.
      * @description
      * This is the main class to interact with the Dymo API. It should be
@@ -29,45 +26,26 @@ class DymoAPI {
      * @example
      * const dymoApi = new DymoAPI({
      *     rootApiKey: "6bfb7675-6b69-4f8d-9f43-5a6f7f02c6c5",
-     *     apiKey: "4c8b7675-6b69-4f8d-9f43-5a6f7f02c6c5",
-     *     local: true
+     *     apiKey: "4c8b7675-6b69-4f8d-9f43-5a6f7f02c6c5"
      * });
      */
     constructor(
         {
             rootApiKey = null,
             apiKey = null,
-            local = false,
+            baseUrl = "https://api.tpeoficial.com",
             serverEmailConfig = undefined
         }: {
             rootApiKey?: string | null;
             apiKey?: string | null;
-            local?: boolean;
+            baseUrl?: string;
             serverEmailConfig?: Interfaces.ServerEmailConfig;
         } = {}) {
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
         this.serverEmailConfig = serverEmailConfig;
-        this.local = rootApiKey ? local : false; // Only allow setting local if rootApiKey is defined.
-        setBaseUrl(this.local);
-        this.autoupdate();
-    }
-
-    /**
-     * Checks for updates and logs a message if a new version is available.
-     *
-     * This method is called in the constructor and will throw an error if the
-     * update check fails.
-     *
-     * @throws Will throw an error if there is an issue with the update check
-     * process.
-     */
-    private async autoupdate(): Promise<void> {
-        try {
-            await checkForUpdates();
-        } catch (error: any) {
-            console.error(`[${config.lib.name}] Error checking the latest version in npmjs: ${error.message}`);
-        }
+        this.baseUrl = baseUrl;
+        setBaseUrl(baseUrl);
     }
 
     // FUNCTIONS / Private.

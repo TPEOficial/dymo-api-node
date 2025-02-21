@@ -37,7 +37,10 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
         const response = await axios.post(`${BASE_URL}/v1/private/secure/verify`, data, { headers: { "Authorization": token } });
         return response.data;
     } catch (error: any) {
-        throw customError(5000, error.response?.data?.message || error.message);
+        const statusCode = error.response?.status || 500;
+        const errorMessage = error.response?.data?.message || error.message;
+        const errorDetails = JSON.stringify(error.response?.data || {});
+        throw customError(5000, `Error ${statusCode}: ${errorMessage}. Details: ${errorDetails}`);
     }
 };
 
