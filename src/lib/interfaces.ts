@@ -1,9 +1,9 @@
 import type * as React from "react";
 
-export interface PhoneData {
+export type PhoneData = {
     iso: any;
     phone: string;
-};
+} | string;
 
 export interface CreditCardData {
     pan: string | number;
