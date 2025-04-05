@@ -1,11 +1,10 @@
 import path from "path";
-import axios from "axios";
 import React from "react";
 import fs from "fs/promises";
 import { twi } from "tw-to-css";
-import config, { BASE_URL } from "../config";
 import { render } from "@react-email/render";
 import * as Interfaces from "../lib/interfaces";
+import config, { axiosApiUrl } from "../config";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
@@ -34,7 +33,7 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
     if (token === null) throw customError(3000, "Invalid private token.");
     if (!Object.keys(data).some((key) => ["email", "phone", "domain", "creditCard", "ip", "wallet"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
     try {
-        const response = await axios.post(`${BASE_URL}/v1/private/secure/verify`, data, { headers: { "Authorization": token } });
+        const response = await axiosApiUrl.post("/private/secure/verify", data, { headers: { "Content-Type": "application/json", "Authorization": token } });
         return response.data;
     } catch (error: any) {
         const statusCode = error.response?.status || 500;
@@ -97,7 +96,7 @@ export const sendEmail = async (token: string | null, data: Interfaces.SendEmail
             );
             data.attachments = processedAttachments;
         }
-        const response = await axios.post(`${BASE_URL}/v1/private/sender/sendEmail`, data, { headers: { "Authorization": token } });
+        const response = await axiosApiUrl.post("/private/sender/sendEmail", data, { headers: { "Authorization": token } });
         return response.data;
     } catch (error: any) {
         throw customError(5000, error.response?.data?.message || error.message);
@@ -124,7 +123,7 @@ export const getRandom = async (token: string | null, data: Interfaces.SRNG): Pr
     if (data.min < -1000000000 || data.min > 1000000000) throw customError(1500, "'min' must be an integer in the interval [-1000000000}, 1000000000].");
     if (data.max < -1000000000 || data.max > 1000000000) throw customError(1500, "'max' must be an integer in the interval [-1000000000}, 1000000000].");
     try {
-        const response = await axios.post(`${BASE_URL}/v1/private/srng`, data, { headers: { "Authorization": token } });
+        const response = await axiosApiUrl.post("/private/srng", data, { headers: { "Content-Type": "application/json", "Authorization": token } });
         return response.data;
     } catch (error: any) {
         throw customError(5000, error.response?.data?.message || error.message);

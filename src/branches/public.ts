@@ -1,5 +1,4 @@
-import axios from "axios";
-import config, { BASE_URL } from "../config";
+import config, { axiosApiUrl } from "../config";
 import * as Interfaces from "../lib/interfaces";
 
 const customError = (code: number, message: string): Error => {
@@ -10,7 +9,7 @@ export const getPrayerTimes = async (data: Interfaces.PrayerTimesData): Promise<
     const { lat, lon } = data;
     if (lat === undefined || lon === undefined) throw customError(1000, "You must provide a latitude and longitude.");
     try {
-        const response = await axios.get(`${BASE_URL}/v1/public/islam/prayertimes`, { params: data });
+        const response = await axiosApiUrl.get("/public/islam/prayertimes", { params: data });
         return response.data;
     } catch (error: any) {
         throw customError(5000, error.response?.data?.message || error.message);
@@ -21,7 +20,7 @@ export const satinizer = async (data: Interfaces.InputSatinizerData): Promise<an
     const { input } = data;
     if (input === undefined) throw customError(1000, "You must specify at least the input.");
     try {
-        const response = await axios.get(`${BASE_URL}/v1/public/inputSatinizer`, { params: { input: encodeURIComponent(input) } });
+        const response = await axiosApiUrl.get("/public/inputSatinizer", { params: { input: encodeURIComponent(input) } });
         return response.data;
     } catch (error: any) {
         throw customError(5000, error.response?.data?.message || error.message);
@@ -54,7 +53,7 @@ export const isValidPwd = async (data: Interfaces.IsValidPwdData): Promise<any> 
     if (max !== undefined) params.max = max;
 
     try {
-        const response = await axios.get(`${BASE_URL}/v1/public/validPwd`, { params });
+        const response = await axiosApiUrl.get("/public/validPwd", { params });
         return response.data;
     } catch (error: any) {
         throw customError(5000, error.response?.data?.message || error.message);

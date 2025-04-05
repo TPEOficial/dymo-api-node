@@ -1,6 +1,6 @@
 {
   "name": "dymo-api",
-  "version": "1.0.92",
+  "version": "1.0.93",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.js",
   "module": "dist/esm/dymo-api.js",
