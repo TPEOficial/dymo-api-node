@@ -23,8 +23,7 @@ const axiosApiUrl = axios.create({
     baseURL: `${BASE_URL}/v1`,
     headers: {
         "User-Agent": "DymoAPISDK/1.0.0"
-    },
-    timeout: 5000
+    }
 });
 
 export { BASE_URL, axiosApiUrl };
