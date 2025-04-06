@@ -1,7 +1,7 @@
+import config, { setBaseUrl } from "./config";
 import * as Interfaces from "./lib/interfaces";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
-import config, { BASE_URL, setBaseUrl } from "./config";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
