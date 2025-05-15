@@ -208,10 +208,10 @@ export interface DataValidationAnalysis {
         phone: string;
         prefix: string;
         number: string;
+        lineType: "PREMIUM_RATE" | "TOLL_FREE" | "SHARED_COST" | "VOIP" | "PERSONAL_NUMBER" | "PAGER" | "UAN" | "VOICEMAIL" | "FIXED_LINE_OR_MOBILE" | "FIXED_LINE" | "MOBILE" | "Unknown";
         carrierInfo: {
             carrierName: string;
             accuracy: number;
-            carrierType: "PREMIUM_RATE" | "TOLL_FREE" | "SHARED_COST" | "VOIP" | "PERSONAL_NUMBER" | "PAGER" | "UAN" | "VOICEMAIL" | "FIXED_LINE_OR_MOBILE" | "FIXED_LINE" | "MOBILE" | "Unknown";
             carrierCountry: string;
             carrierCountryCode: string;
         };
