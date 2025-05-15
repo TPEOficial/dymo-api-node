@@ -208,6 +208,13 @@ export interface DataValidationAnalysis {
         phone: string;
         prefix: string;
         number: string;
+        carrierInfo: {
+            carrierName: string;
+            accuracy: number;
+            carrierType: "PREMIUM_RATE" | "TOLL_FREE" | "SHARED_COST" | "VOIP" | "PERSONAL_NUMBER" | "PAGER" | "UAN" | "VOICEMAIL" | "FIXED_LINE_OR_MOBILE" | "FIXED_LINE" | "MOBILE" | "Unknown";
+            carrierCountry: string;
+            carrierCountryCode: string;
+        };
         country: string;
         countryCode: string;
         plugins: {
