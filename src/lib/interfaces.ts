@@ -188,7 +188,8 @@ export interface DataValidationAnalysis {
         corporate: boolean;
         email: string;
         realUser: string;
-        didYouMean: string | null,
+        didYouMean: string | null;
+        noReply: boolean;
         customTLD: boolean;
         domain: string;
         roleAccount: boolean;
