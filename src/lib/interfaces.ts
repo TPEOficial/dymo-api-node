@@ -283,7 +283,7 @@ export interface DataValidationAnalysis {
         valid: boolean;
         fraud: boolean;
         wallet: string;
-        type: "Bitcoin" | "Bitcoin (Bech32)" | "Ethereum" | "Litecoin" | "Cardano" | "Binance Smart Chain";
+        type: string;
         plugins: {
             blocklist?: boolean;
             torNetwork?: boolean;
