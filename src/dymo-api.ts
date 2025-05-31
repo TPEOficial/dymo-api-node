@@ -123,6 +123,23 @@ class DymoAPI {
         return await PrivateAPI.getRandom(this.rootApiKey || this.apiKey, data);
     }
 
+    
+    /**
+     * Extracts structured data from a given string using Textly.
+     *
+     * This method requires either the root API key or the API key to be set.
+     * If neither is set, it will throw an error.
+     *
+     * @param {Interfaces.ExtractWithTextly} data - The data to be sent, containing the string to be processed and the format schema.
+     * @returns {Promise<any>} A promise that resolves to the extracted structured data.
+     * @throws Will throw an error if there is an issue with the extraction process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/textly/text-extraction)
+     */
+    async extractWithTextly(data: Interfaces.ExtractWithTextly): Promise<any> {
+        return await PrivateAPI.extractWithTextly(this.rootApiKey || this.apiKey, data);
+    }
+
     // FUNCTIONS / Public.
     /**
      * Retrieves the prayer times for the given location.

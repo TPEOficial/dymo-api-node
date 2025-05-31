@@ -34,6 +34,7 @@ declare module "dymo-api" {
         initializeTokens(): Promise<void>;
         isValidData(data: any): Promise<any>;
         getRandom(data: any): Promise<any>;
+        extractWithTextly(data: any): Promise<any>;
         getPrayerTimes(data: any): Promise<any>;
         inputSatinizer(data: any): Promise<any>;
         isValidPwd(data: any): Promise<any>;

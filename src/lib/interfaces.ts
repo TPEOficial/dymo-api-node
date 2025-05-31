@@ -290,3 +290,28 @@ export interface DataValidationAnalysis {
         };
     };
 }
+
+export type SchemaType = "string" | "number" | "boolean" | "array" | "object";
+
+export interface JsonSchemaProperty {
+    type: SchemaType;
+    items?: JsonSchemaProperty;
+    properties?: Record<string, JsonSchemaProperty>;
+    required?: string[];
+    description?: string;
+    format?: string;
+    enum?: unknown[];
+    minimum?: number;
+    maximum?: number;
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+    [key: string]: unknown;
+}
+
+export interface ExtractWithTextly {
+    data: string;
+    format: { 
+        [key: string]: JsonSchemaProperty;
+    };
+}
