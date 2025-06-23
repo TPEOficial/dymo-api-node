@@ -22,7 +22,7 @@ const convertTailwindToInlineCss = (htmlContent: string): string => {
  * 
  * @param token - A string or null representing the authentication token. Must not be null.
  * @param data - An object adhering to the Validator interface, containing at least one of the following fields: 
- *               email, phone, domain, creditCard, ip, or wallet.
+ *               url, email, phone, domain, creditCard, ip, or wallet.
  * 
  * @returns A promise that resolves to the response data from the verification endpoint.
  * 
