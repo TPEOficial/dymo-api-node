@@ -57,6 +57,7 @@ class DymoAPI {
      * If neither is set, it will throw an error.
      *
      * @param {Object} data - The data to be validated.
+     * @param {string} [data.url] - Optional URL to be validated.
      * @param {string} [data.email] - Optional email address to be validated.
      * @param {Interfaces.PhoneData} [data.phone] - Optional phone number data to be validated.
      * @param {string} [data.domain] - Optional domain name to be validated.
