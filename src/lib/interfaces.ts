@@ -316,8 +316,13 @@ export interface DataValidationAnalysis {
         version?: string | null;
         userAgent?: string;
         fraud?: boolean;
-        isRealUser?: boolean;
+        bot?: boolean;
         info?: string;
+        os?: string;
+        device: {
+            type?: string;
+            brand?: string;
+        };
         plugins?: {
             blocklist?: boolean;
         };
