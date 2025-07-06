@@ -22,6 +22,7 @@ export interface Validator {
     creditCard?: string | CreditCardData;
     ip?: string;
     wallet?: string;
+    userAgent?: string;
     plugins?: VerifyPlugins[];
 };
 
@@ -65,9 +66,9 @@ export type SendEmail = {
         onlyVerifiedEmails?: boolean;
     };
 } & (
-    { html: string; react?: never; } |
-    { react: React.ReactNode; html?: never; }
-);
+        { html: string; react?: never; } |
+        { react: React.ReactNode; html?: never; }
+    );
 
 export interface PrayerTimesData {
     lat?: number;
@@ -307,6 +308,20 @@ export interface DataValidationAnalysis {
             torNetwork?: boolean;
         };
     };
+    userAgent: {
+        valid: boolean;
+        type?: string;
+        clientSlug?: string | null;
+        clientName?: string;
+        version?: string | null;
+        userAgent?: string;
+        fraud?: boolean;
+        isRealUser?: boolean;
+        info?: string;
+        plugins?: {
+            blocklist?: boolean;
+        };
+    };
 }
 
 export type SchemaType = "string" | "number" | "boolean" | "array" | "object";
@@ -329,7 +344,7 @@ export interface JsonSchemaProperty {
 
 export interface ExtractWithTextly {
     data: string;
-    format: { 
+    format: {
         [key: string]: JsonSchemaProperty;
     };
 }

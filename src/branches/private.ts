@@ -22,7 +22,7 @@ const convertTailwindToInlineCss = (htmlContent: string): string => {
  * 
  * @param token - A string or null representing the authentication token. Must not be null.
  * @param data - An object adhering to the Validator interface, containing at least one of the following fields: 
- *               url, email, phone, domain, creditCard, ip, or wallet.
+ *               url, email, phone, domain, creditCard, ip, wallet or user agent.
  * 
  * @returns A promise that resolves to the response data from the verification endpoint.
  * 
@@ -31,7 +31,7 @@ const convertTailwindToInlineCss = (htmlContent: string): string => {
  */
 export const isValidData = async (token: string | null, data: Interfaces.Validator): Promise<any> => {
     if (token === null) throw customError(3000, "Invalid private token.");
-    if (!Object.keys(data).some((key) => ["url", "email", "phone", "domain", "creditCard", "ip", "wallet"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
+    if (!Object.keys(data).some((key) => ["url", "email", "phone", "domain", "creditCard", "ip", "wallet", "userAgent"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
     try {
         const response = await axiosApiUrl.post("/private/secure/verify", data, { headers: { "Content-Type": "application/json", "Authorization": token } });
         return response.data;
