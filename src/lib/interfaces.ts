@@ -12,7 +12,7 @@ export interface CreditCardData {
     cvv?: string | number;
 };
 
-export type VerifyPlugins = "blocklist" | "compromiseDetector" | "nsfw" | "reputation" | "torNetwork" | "typosquatting" | "urlShortener";
+export type VerifyPlugins = "blocklist" | "compromiseDetector" | "nsfw" | "reputation" | "riskScore" | "torNetwork" | "typosquatting" | "urlShortener";
 
 export interface Validator {
     url?: string;
@@ -194,6 +194,7 @@ export interface DataValidationAnalysis {
             compromiseDetector?: boolean;
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
+            riskScore?: number;
             torNetwork?: boolean;
             typosquatting?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
             urlShortener?: boolean;
@@ -217,6 +218,7 @@ export interface DataValidationAnalysis {
             compromiseDetector?: boolean;
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
+            riskScore?: number;
             torNetwork?: boolean;
             typosquatting?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
             urlShortener?: boolean;
@@ -239,6 +241,7 @@ export interface DataValidationAnalysis {
         countryCode: string;
         plugins: {
             blocklist?: boolean;
+            riskScore?: number;
         };
     };
     domain: {
@@ -252,6 +255,7 @@ export interface DataValidationAnalysis {
             compromiseDetector?: boolean;
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
+            riskScore?: number;
             torNetwork?: boolean;
             typosquatting?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
             urlShortener?: boolean;
@@ -305,6 +309,7 @@ export interface DataValidationAnalysis {
         type: string;
         plugins: {
             blocklist?: boolean;
+            riskScore?: number;
             torNetwork?: boolean;
         };
     };
@@ -325,6 +330,7 @@ export interface DataValidationAnalysis {
         };
         plugins?: {
             blocklist?: boolean;
+            riskScore?: number;
         };
     };
 }
