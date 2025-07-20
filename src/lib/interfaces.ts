@@ -269,6 +269,7 @@ export interface DataValidationAnalysis {
         creditCard: string;
         plugins: {
             blocklist?: boolean;
+            riskScore?: number;
         };
     };
     ip: {
@@ -300,6 +301,7 @@ export interface DataValidationAnalysis {
         hosting: boolean;
         plugins: {
             blocklist?: boolean;
+            riskScore?: number;
         };
     };
     wallet: {
