@@ -180,4 +180,5 @@ export interface ExtractWithTextly {
     };
 }
 
+export * from "./rules";
 export * from "./data-verifier";

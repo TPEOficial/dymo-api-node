@@ -11,6 +11,7 @@ class DymoAPI {
     private rootApiKey: string | null;
     private apiKey: string | null;
     private serverEmailConfig?: Interfaces.ServerEmailConfig;
+    private rules: Interfaces.Rules;
     private baseUrl: string;
 
     /**
@@ -35,16 +36,25 @@ class DymoAPI {
             rootApiKey = null,
             apiKey = null,
             baseUrl = "https://api.tpeoficial.com",
-            serverEmailConfig = undefined
+            serverEmailConfig = undefined,
+            rules = {
+                email: {
+                    deny: [
+                        "FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"
+                    ]
+                }
+            }
         }: {
             rootApiKey?: string | null;
             apiKey?: string | null;
             baseUrl?: string;
             serverEmailConfig?: Interfaces.ServerEmailConfig;
+            rules?: Interfaces.Rules;
         } = {}) {
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
         this.serverEmailConfig = serverEmailConfig;
+        this.rules = rules;
         this.baseUrl = baseUrl;
         setBaseUrl(baseUrl);
     };
@@ -95,7 +105,7 @@ class DymoAPI {
      */
     async isValidEmail(
         email: Interfaces.EmailValidator,
-        rules?: Interfaces.EmailValidatorRules
+        rules: Interfaces.EmailValidatorRules = this.rules.email
     ): Promise<Interfaces.EmailValidatorResponse> {
         return await PrivateAPI.isValidEmail(this.rootApiKey || this.apiKey, email, rules);
     };

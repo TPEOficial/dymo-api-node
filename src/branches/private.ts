@@ -63,11 +63,7 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
 export const isValidEmail = async (
     token: string | null,
     email: Interfaces.EmailValidator,
-    rules: Interfaces.EmailValidatorRules = { 
-        deny: [
-            "FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"
-        ]
-    }
+    rules: Interfaces.EmailValidatorRules
 ): Promise<any> => {
     if (token === null) throw customError(3000, "Invalid private token.");
     if (rules.deny.length === 0) throw customError(1500, "You must provide at least one deny rule.");
