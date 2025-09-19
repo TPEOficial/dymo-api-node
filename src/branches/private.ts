@@ -3,7 +3,7 @@ import React from "react";
 import fs from "fs/promises";
 import { twi } from "tw-to-css";
 import { render } from "@react-email/render";
-import * as Interfaces from "../lib/interfaces";
+import * as Interfaces from "../lib/types/interfaces";
 import config, { axiosApiUrl } from "../config";
 
 const customError = (code: number, message: string): Error => {
@@ -35,6 +35,59 @@ export const isValidData = async (token: string | null, data: Interfaces.Validat
     try {
         const response = await axiosApiUrl.post("/private/secure/verify", data, { headers: { "Content-Type": "application/json", "Authorization": token } });
         return response.data;
+    } catch (error: any) {
+        const statusCode = error.response?.status || 500;
+        const errorMessage = error.response?.data?.message || error.message;
+        const errorDetails = JSON.stringify(error.response?.data || {});
+        throw customError(5000, `Error ${statusCode}: ${errorMessage}. Details: ${errorDetails}`);
+    }
+};
+
+/**
+ * Validates an email using a secure verification endpoint.
+ *
+ * @param {string | null} token - Authentication token (required).
+ * @param {Interfaces.EmailValidator} email - Email to validate.
+ * @param {Interfaces.EmailValidatorRules} [rules] - Deny rules. Defaults to ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"].
+ *
+ * Deny rules (some are premium ⚠️):
+ * - "FRAUD", "INVALID", "NO_MX_RECORDS" ⚠️, "PROXIED_EMAIL" ⚠️, "FREE_SUBDOMAIN" ⚠️,
+ *   "PERSONAL_EMAIL", "CORPORATE_EMAIL", "NO_REPLY_EMAIL", "ROLE_ACCOUNT", "NO_REACHABLE", "HIGH_RISK_SCORE" ⚠️
+ *
+ * @returns {Promise<boolean>} True if the email passes all deny rules, false otherwise.
+ * @throws Error if token is null, rules are empty, or request fails.
+ *
+ * @example
+ * const valid = await isValidEmail(apiToken, "user@example.com", { deny: ["FRAUD", "NO_MX_RECORDS"] });
+ */
+export const isValidEmail = async (
+    token: string | null,
+    email: Interfaces.EmailValidator,
+    rules: Interfaces.EmailValidatorRules = { 
+        deny: [
+            "FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"
+        ]
+    }
+): Promise<any> => {
+    if (token === null) throw customError(3000, "Invalid private token.");
+    if (rules.deny.length === 0) throw customError(1500, "You must provide at least one deny rule.");
+    try {
+        const responseEmail = (await axiosApiUrl.post("/private/secure/verify", {
+            email
+        }, { headers: { "Content-Type": "application/json", "Authorization": token } })).data.email;
+        
+        if (rules.deny.includes("INVALID") && !responseEmail.valid) return false;
+        if (rules.deny.includes("FRAUD") && responseEmail.fraud) return false;
+        if (rules.deny.includes("PROXIED_EMAIL") && responseEmail.proxiedEmail) return false;
+        if (rules.deny.includes("FREE_SUBDOMAIN") && responseEmail.freeSubdomain) return false;
+        if (rules.deny.includes("PERSONAL_EMAIL") && !responseEmail.corporate) return false;
+        if (rules.deny.includes("CORPORATE_EMAIL") && responseEmail.corporate) return false;
+        if (rules.deny.includes("NO_MX_RECORDS") && responseEmail.plugins.mxRecords.length === 0) return false;
+        if (rules.deny.includes("NO_REPLY_EMAIL") && responseEmail.noReply) return false;
+        if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.plugins.roleAccount) return false;
+        if (rules.deny.includes("NO_REACHABLE") && !responseEmail.plugins.reachable) return false;
+        if (rules.deny.includes("HIGH_RISK_SCORE") && responseEmail.plugins.riskScore > 85) return false;
+        return true;
     } catch (error: any) {
         const statusCode = error.response?.status || 500;
         const errorMessage = error.response?.data?.message || error.message;

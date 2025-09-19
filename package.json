@@ -1,6 +1,6 @@
 {
   "name": "dymo-api",
-  "version": "1.1.05",
+  "version": "1.1.06",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.js",
   "module": "dist/esm/dymo-api.js",
@@ -26,7 +26,8 @@
     "build": "rimraf dist && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && node ./scripts/rename.js",
     "start": "ts-node src/dymo-api.ts",
     "prepublishOnly": "npm run build",
-    "test": "node --max-old-space-size=4096 test/index.js"
+    "test": "jest --max-old-space-size=4096",
+    "test:watch": "jest --watch --max-old-space-size=4096"
   },
   "repository": {
     "url": "https://github.com/TPEOficial/dymo-api-node"
@@ -48,7 +49,6 @@
     "@types/react": "^18.3.5",
     "axios": "^1.6.8",
     "path": "^0.12.7",
-    "rimraf": "^6.0.1",
     "tw-to-css": "0.0.12"
   },
   "contributors": [
@@ -57,7 +57,11 @@
   ],
   "devDependencies": {
     "@types/axios": "^0.9.36",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.9.3",
+    "jest": "^30.1.3",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }

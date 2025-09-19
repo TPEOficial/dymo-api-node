@@ -32,7 +32,11 @@ declare module "dymo-api" {
         private local: boolean;
         constructor(configuration?: ConfigurationOptions);
         initializeTokens(): Promise<void>;
+
+        // Data Validation.
         isValidData(data: any): Promise<any>;
+        isValidEmail(data: any): Promise<any>;
+
         getRandom(data: any): Promise<any>;
         extractWithTextly(data: any): Promise<any>;
         getPrayerTimes(data: any): Promise<any>;

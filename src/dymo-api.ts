@@ -1,5 +1,5 @@
 import config, { setBaseUrl } from "./config";
-import * as Interfaces from "./lib/interfaces";
+import * as Interfaces from "./lib/types/interfaces";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 
@@ -47,7 +47,7 @@ class DymoAPI {
         this.serverEmailConfig = serverEmailConfig;
         this.baseUrl = baseUrl;
         setBaseUrl(baseUrl);
-    }
+    };
 
     // FUNCTIONS / Private.
     /**
@@ -73,7 +73,33 @@ class DymoAPI {
      */
     async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
         return await PrivateAPI.isValidData(this.rootApiKey || this.apiKey, data);
-    }
+    };
+
+    /**
+     * Validates the given email against the configured rules.
+     *
+     * This method requires either the root API key or the API key to be set.
+     * If neither is set, it will throw an error.
+     *
+     * @param {string} [email] - Optional email address to validate.
+     * @param {NegativeEmailRules[]} [rules] - Optional rules for validation. Some rules are premium features.
+     * @important
+     * Values indicating why an email is considered negative.
+     * **⚠️ NO_MX_RECORDS, HIGH_RISK_SCORE and NO_REACHABLE are [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) features.**
+     * @returns {Promise<Interfaces.EmailValidatorResponse>} Resolves with the validation response.
+     * @throws Will throw an error if validation cannot be performed.
+     *
+     * @example
+     * const valid = await dymoClient.isValidEmail("user@example.com", { deny: ["FRAUD", "NO_MX_RECORDS"] });
+     * 
+     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
+     */
+    async isValidEmail(
+        email: Interfaces.EmailValidator,
+        rules?: Interfaces.EmailValidatorRules
+    ): Promise<Interfaces.EmailValidatorResponse> {
+        return await PrivateAPI.isValidEmail(this.rootApiKey || this.apiKey, email, rules);
+    };
 
     /**
      * Sends an email using the configured email client settings.
@@ -104,7 +130,7 @@ class DymoAPI {
     async sendEmail(data: Interfaces.SendEmail): Promise<Interfaces.EmailStatus> {
         if (!this.serverEmailConfig && !this.rootApiKey) console.error(`[${config.lib.name}] You must configure the email client settings.`);
         return await PrivateAPI.sendEmail(this.rootApiKey || this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
-    }
+    };
 
     /**
      * Generates a random number between the provided min and max values.
@@ -123,7 +149,7 @@ class DymoAPI {
      */
     async getRandom(data: Interfaces.SRNG): Promise<Interfaces.SRNSummary> {
         return await PrivateAPI.getRandom(this.rootApiKey || this.apiKey, data);
-    }
+    };
 
     
     /**
@@ -140,7 +166,7 @@ class DymoAPI {
      */
     async extractWithTextly(data: Interfaces.ExtractWithTextly): Promise<any> {
         return await PrivateAPI.extractWithTextly(this.rootApiKey || this.apiKey, data);
-    }
+    };
 
     // FUNCTIONS / Public.
     /**
@@ -159,7 +185,7 @@ class DymoAPI {
      */
     async getPrayerTimes(data: Interfaces.PrayerTimesData): Promise<Interfaces.CountryPrayerTimes | { error: string }> {
         return await PublicAPI.getPrayerTimes(data);
-    }
+    };
 
     /**
      * Satinizes the input, replacing any special characters with their HTML
@@ -174,7 +200,7 @@ class DymoAPI {
      */
     async satinizer(data: Interfaces.InputSatinizerData): Promise<Interfaces.SatinizedInputAnalysis> {
         return await PublicAPI.satinizer(data);
-    }
+    };
 
     /**
      * Validates a password based on the given parameters.
@@ -203,7 +229,7 @@ class DymoAPI {
      */
     async isValidPwd(data: Interfaces.IsValidPwdData): Promise<Interfaces.PasswordValidationResult> {
         return await PublicAPI.isValidPwd(data);
-    }
-}
+    };
+};
 
 export default DymoAPI;

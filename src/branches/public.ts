@@ -1,5 +1,5 @@
 import config, { axiosApiUrl } from "../config";
-import * as Interfaces from "../lib/interfaces";
+import * as Interfaces from "../lib/types/interfaces";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
@@ -39,11 +39,8 @@ export const isValidPwd = async (data: Interfaces.IsValidPwdData): Promise<any> 
 
     if (bannedWords) {
         if (typeof bannedWords === "string") bannedWords = bannedWords.slice(1, -1).trim().split(",").map(item => item.trim());
-
-        if (!Array.isArray(bannedWords) || bannedWords.length > 10)
-            throw customError(1500, "If you provide a list of banned words; the list may not exceed 10 words and must be of array type.");
-        if (!bannedWords.every(word => typeof word === "string") || new Set(bannedWords).size !== bannedWords.length)
-            throw customError(1500, "If you provide a list of banned words; all elements must be non-repeated strings.");
+        if (!Array.isArray(bannedWords) || bannedWords.length > 10) throw customError(1500, "If you provide a list of banned words; the list may not exceed 10 words and must be of array type.");
+        if (!bannedWords.every(word => typeof word === "string") || new Set(bannedWords).size !== bannedWords.length) throw customError(1500, "If you provide a list of banned words; all elements must be non-repeated strings.");
         params.bannedWords = bannedWords;
     }
 
