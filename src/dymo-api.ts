@@ -84,7 +84,6 @@ class DymoAPI {
      * @param {string} [email] - Optional email address to validate.
      * @param {NegativeEmailRules[]} [rules] - Optional rules for validation. Some rules are premium features.
      * @important
-     * Values indicating why an email is considered negative.
      * **⚠️ NO_MX_RECORDS, HIGH_RISK_SCORE and NO_REACHABLE are [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) features.**
      * @returns {Promise<Interfaces.EmailValidatorResponse>} Resolves with the validation response.
      * @throws Will throw an error if validation cannot be performed.

@@ -73,7 +73,12 @@ export const isValidEmail = async (
     if (rules.deny.length === 0) throw customError(1500, "You must provide at least one deny rule.");
     try {
         const responseEmail = (await axiosApiUrl.post("/private/secure/verify", {
-            email
+            email,
+            plugins: [
+                rules.deny.includes("NO_MX_RECORDS") ? "mxRecords" : undefined,
+                rules.deny.includes("NO_REACHABLE") ? "reachability" : undefined,
+                rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined
+            ]
         }, { headers: { "Content-Type": "application/json", "Authorization": token } })).data.email;
         
         if (rules.deny.includes("INVALID") && !responseEmail.valid) return false;
@@ -86,7 +91,7 @@ export const isValidEmail = async (
         if (rules.deny.includes("NO_REPLY_EMAIL") && responseEmail.noReply) return false;
         if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.plugins.roleAccount) return false;
         if (rules.deny.includes("NO_REACHABLE") && !responseEmail.plugins.reachable) return false;
-        if (rules.deny.includes("HIGH_RISK_SCORE") && responseEmail.plugins.riskScore > 85) return false;
+        if (rules.deny.includes("HIGH_RISK_SCORE") && responseEmail.plugins.riskScore >= 80) return false;
         return true;
     } catch (error: any) {
         const statusCode = error.response?.status || 500;
