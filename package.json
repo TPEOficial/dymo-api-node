@@ -25,9 +25,9 @@
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && node ./scripts/rename.js",
     "start": "ts-node src/dymo-api.ts",
-    "prepublishOnly": "npm run test && npm run build",
-    "test": "jest --max-old-space-size=4096",
-    "test:watch": "jest --watch --max-old-space-size=4096"
+    "prepublishOnly": "npm run build",
+    "test": "jest --runInBand --max-old-space-size=4096",
+    "test:watch": "jest --runInBand --watch --max-old-space-size=4096"
   },
   "repository": {
     "url": "https://github.com/TPEOficial/dymo-api-node"
