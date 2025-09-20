@@ -1,5 +1,7 @@
+/// <reference types="jest" />
+
 import dotenv from "dotenv";
-import DymoAPI from "../dymo-api.js";
+import DymoAPI from "../src/dymo-api.js";
 
 dotenv.config();
 
@@ -9,7 +11,8 @@ const dymoRootClient = new DymoAPI({
 
 describe("isValidEmail", () => {
     it("Returns true for valid email when rules allow it", async () => {
-        expect(await dymoRootClient.isValidEmail("build-09-19-2025@tpeoficial.com")).toBe(true);
+        const decision = await dymoRootClient.isValidEmail("build-09-19-2025@tpeoficial.com");
+        expect(decision.allow).toBe(true);
     });
 });
 
@@ -28,6 +31,8 @@ describe("isValidEmail", () => {
 
 describe("isValidEmail", () => {
     it("You should check because test.com is a domain reserved for testing without MX records", async () => {
-        expect(await dymoRootClient.isValidEmail("build-09-19-2025@test.com", { deny: ["NO_MX_RECORDS"] })).toBe(false);
+        const decision = await dymoRootClient.isValidEmail("build-09-19-2025@test.com", { deny: ["NO_MX_RECORDS"] })
+        expect(decision.allow).toBe(false);
+        expect(decision.reasons).toContain("NO_MX_RECORDS");
     });
 });

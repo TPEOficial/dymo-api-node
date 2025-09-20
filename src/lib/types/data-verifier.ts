@@ -47,7 +47,38 @@ export interface EmailValidatorRules {
 // -------------------- OUPUT -------------------- //
 
 // ------------ EMAIL VALIDATOR ------------ //
-export type EmailValidatorResponse = boolean;
+export type EmailValidatorResponse = {
+    email: string;
+    allow: boolean;
+    reasons: NegativeEmailRules[];
+    response: DataEmailValidationAnalysis;
+};
+
+interface DataEmailValidationAnalysis {
+    valid: boolean;
+    fraud: boolean;
+    proxiedEmail: boolean;
+    freeSubdomain: boolean;
+    corporate: boolean;
+    email: string;
+    realUser: string;
+    didYouMean: string | null;
+    noReply: boolean;
+    customTLD: boolean;
+    domain: string;
+    roleAccount: boolean;
+    plugins: {
+        blocklist?: boolean;
+        compromiseDetector?: boolean;
+
+        nsfw?: boolean;
+        reputation?: TyposquattingPlugin;
+        riskScore?: number;
+        torNetwork?: boolean;
+        typosquatting?: TyposquattingPlugin;
+        urlShortener?: boolean;
+    };
+}
 
 export interface DataValidationAnalysis {
     url: {
@@ -69,31 +100,7 @@ export interface DataValidationAnalysis {
             urlShortener?: boolean;
         };
     };
-    email: {
-        valid: boolean;
-        fraud: boolean;
-        proxiedEmail: boolean;
-        freeSubdomain: boolean;
-        corporate: boolean;
-        email: string;
-        realUser: string;
-        didYouMean: string | null;
-        noReply: boolean;
-        customTLD: boolean;
-        domain: string;
-        roleAccount: boolean;
-        plugins: {
-            blocklist?: boolean;
-            compromiseDetector?: boolean;
-
-            nsfw?: boolean;
-            reputation?: TyposquattingPlugin;
-            riskScore?: number;
-            torNetwork?: boolean;
-            typosquatting?: TyposquattingPlugin;
-            urlShortener?: boolean;
-        };
-    };
+    email: DataEmailValidationAnalysis;
     phone: {
         valid: boolean;
         fraud: boolean;

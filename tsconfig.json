@@ -13,19 +13,17 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "./dist/types",
-        "rootDir": "./src",
+        "rootDir": ".",
         "declaration": true,
         "declarationDir": "./dist/types",
         "emitDeclarationOnly": true
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "test/**/*"
     ],
     "exclude": [
         "node_modules",
-        "**/__tests__/**",
-        "**/*.spec.ts",
-        "**/*.test.ts",
         "jest.config.js"
     ]
 }

@@ -76,19 +76,27 @@ export const isValidEmail = async (
                 rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined
             ]
         }, { headers: { "Content-Type": "application/json", "Authorization": token } })).data.email;
-        
-        if (rules.deny.includes("INVALID") && !responseEmail.valid) return false;
-        if (rules.deny.includes("FRAUD") && responseEmail.fraud) return false;
-        if (rules.deny.includes("PROXIED_EMAIL") && responseEmail.proxiedEmail) return false;
-        if (rules.deny.includes("FREE_SUBDOMAIN") && responseEmail.freeSubdomain) return false;
-        if (rules.deny.includes("PERSONAL_EMAIL") && !responseEmail.corporate) return false;
-        if (rules.deny.includes("CORPORATE_EMAIL") && responseEmail.corporate) return false;
-        if (rules.deny.includes("NO_MX_RECORDS") && responseEmail.plugins.mxRecords.length === 0) return false;
-        if (rules.deny.includes("NO_REPLY_EMAIL") && responseEmail.noReply) return false;
-        if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.plugins.roleAccount) return false;
-        if (rules.deny.includes("NO_REACHABLE") && !responseEmail.plugins.reachable) return false;
-        if (rules.deny.includes("HIGH_RISK_SCORE") && responseEmail.plugins.riskScore >= 80) return false;
-        return true;
+
+        let reasons: string[] = [];
+
+        if (rules.deny.includes("INVALID") && !responseEmail.valid) reasons.push("INVALID");
+        if (rules.deny.includes("FRAUD") && responseEmail.fraud) reasons.push("FRAUD");
+        if (rules.deny.includes("PROXIED_EMAIL") && responseEmail.proxiedEmail) reasons.push("PROXIED_EMAIL");
+        if (rules.deny.includes("FREE_SUBDOMAIN") && responseEmail.freeSubdomain) reasons.push("FREE_SUBDOMAIN");
+        if (rules.deny.includes("PERSONAL_EMAIL") && !responseEmail.corporate) reasons.push("PERSONAL_EMAIL");
+        if (rules.deny.includes("CORPORATE_EMAIL") && responseEmail.corporate) reasons.push("CORPORATE_EMAIL");
+        if (rules.deny.includes("NO_MX_RECORDS") && responseEmail.plugins.mxRecords.length === 0) reasons.push("NO_MX_RECORDS");
+        if (rules.deny.includes("NO_REPLY_EMAIL") && responseEmail.noReply) reasons.push("NO_REPLY_EMAIL");
+        if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.plugins.roleAccount) reasons.push("ROLE_ACCOUNT");
+        if (rules.deny.includes("NO_REACHABLE") && !responseEmail.plugins.reachable) reasons.push("NO_REACHABLE");
+        if (rules.deny.includes("HIGH_RISK_SCORE") && responseEmail.plugins.riskScore >= 80) reasons.push("HIGH_RISK_SCORE");
+
+        return {
+            email: responseEmail.email,
+            allow: reasons.length === 0,
+            reasons,
+            response: responseEmail
+        };
     } catch (error: any) {
         const statusCode = error.response?.status || 500;
         const errorMessage = error.response?.data?.message || error.message;
