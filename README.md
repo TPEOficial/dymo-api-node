@@ -2,6 +2,10 @@
 
 You can see the library documentation by clicking [here](https://docs.tpeoficial.com/docs/dymo-api/getting-started/libraries?ch-pg=r-dm-node).
 
+#### Installation
+
+Use one of the following commands to install **Dymo API** in your `TS`/`JS` project.
+
 ```bash
 npm i dymo-api
 
@@ -13,6 +17,10 @@ pnpm i dymo-api
 
 yarn add dymo-api
 ```
+
+#### Authenticating ourselves on the client with the API Key
+
+[Get my free API Key](https://tpe.li/new-api-key?ch-pg=gh-dmapi-node-rd-step)
 
 ```ts
 import DymoAPI from "dymo-api";
