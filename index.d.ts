@@ -11,6 +11,14 @@ export interface ConfigurationOptions {
             pass: string;
         };
     };
+    rules?: {
+        email: {
+            deny: string[];
+        };
+        sensitiveInfo: {
+            deny: string[];
+        };
+    };
 }
 
 //@ts-ignore
@@ -27,6 +35,14 @@ declare module "dymo-api" {
             auth: {
                 user: string;
                 pass: string;
+            };
+        };
+        private rules?: {
+            email: {
+                deny: string[];
+            };
+            sensitiveInfo: {
+                deny: string[];
             };
         };
         private local: boolean;
