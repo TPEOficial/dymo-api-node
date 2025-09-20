@@ -1,7 +1,7 @@
 import config, { setBaseUrl } from "./config";
-import * as Interfaces from "./lib/types/interfaces";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
+import * as Interfaces from "./lib/types/interfaces";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
@@ -31,35 +31,27 @@ class DymoAPI {
      *     apiKey: "4c8b7675-6b69-4f8d-9f43-5a6f7f02c6c5"
      * });
      */
-    constructor(
-        {
-            rootApiKey = null,
-            apiKey = null,
-            baseUrl = "https://api.tpeoficial.com",
-            serverEmailConfig = undefined,
-            rules = {
-                email: {
-                    deny: [
-                        "FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"
-                    ]
-                },
-                sensitiveInfo: {
-                    deny: [
-                        "EMAIL", "PHONE", "CREDIT_CARD"
-                    ]
-                }
-            }
-        }: {
-            rootApiKey?: string | null;
-            apiKey?: string | null;
-            baseUrl?: string;
-            serverEmailConfig?: Interfaces.ServerEmailConfig;
-            rules?: Interfaces.Rules;
-        } = {}) {
+    constructor({
+        rootApiKey = null,
+        apiKey = null,
+        baseUrl = "https://api.tpeoficial.com",
+        serverEmailConfig = undefined,
+        rules = {}
+    }: {
+        rootApiKey?: string | null;
+        apiKey?: string | null;
+        baseUrl?: string;
+        serverEmailConfig?: Interfaces.ServerEmailConfig;
+        rules?: Interfaces.Rules;
+    } = {}) {
+        this.rules = {
+            email: { deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
+            sensitiveInfo: { deny: ["EMAIL", "PHONE", "CREDIT_CARD"] },
+            ...rules
+        };
         this.rootApiKey = rootApiKey;
         this.apiKey = apiKey;
         this.serverEmailConfig = serverEmailConfig;
-        this.rules = rules;
         this.baseUrl = baseUrl;
         setBaseUrl(baseUrl);
     };
@@ -110,7 +102,7 @@ class DymoAPI {
      */
     async isValidEmail(
         email: Interfaces.EmailValidator,
-        rules: Interfaces.EmailValidatorRules = this.rules.email
+        rules: Interfaces.EmailValidatorRules = this.rules.email!
     ): Promise<Interfaces.EmailValidatorResponse> {
         return await PrivateAPI.isValidEmail(this.rootApiKey || this.apiKey, email, rules);
     };

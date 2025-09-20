@@ -40,15 +40,9 @@ export type NegativeEmailRules =
     | "ROLE_ACCOUNT"
     | "NO_REACHABLE"         // ⚠️ Premium
     | "HIGH_RISK_SCORE";     // ⚠️ Premium
-export interface EmailValidatorRules {
-    deny: NegativeEmailRules[];
-}
 
 // ------------ SENSITIVE INFO VALIDATOR ------------ //
 export type NegativeSensitiveInfoRules = "EMAIL" | "PHONE" | "CREDIT_CARD" | "URL" | "DOMAIN" | "IP" | "WALLET" | "USER_AGENT";
-export interface SensitiveInfoRules {
-    deny: NegativeSensitiveInfoRules[];
-}
 
 // -------------------- OUPUT -------------------- //
 
