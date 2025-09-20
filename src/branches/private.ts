@@ -3,8 +3,8 @@ import React from "react";
 import fs from "fs/promises";
 import { twi } from "tw-to-css";
 import { render } from "@react-email/render";
-import * as Interfaces from "../lib/types/interfaces";
 import config, { axiosApiUrl } from "../config";
+import * as Interfaces from "../lib/types/interfaces";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });

@@ -44,6 +44,12 @@ export interface EmailValidatorRules {
     deny: NegativeEmailRules[];
 }
 
+// ------------ SENSITIVE INFO VALIDATOR ------------ //
+export type NegativeSensitiveInfoRules = "EMAIL" | "PHONE" | "CREDIT_CARD" | "URL" | "DOMAIN" | "IP" | "WALLET" | "USER_AGENT";
+export interface SensitiveInfoRules {
+    deny: NegativeSensitiveInfoRules[];
+}
+
 // -------------------- OUPUT -------------------- //
 
 // ------------ EMAIL VALIDATOR ------------ //
@@ -52,6 +58,13 @@ export type EmailValidatorResponse = {
     allow: boolean;
     reasons: NegativeEmailRules[];
     response: DataEmailValidationAnalysis;
+};
+
+// ------------ SENSITIVE INFO VALIDATOR ------------ //
+export type SensitiveInfoResponse = {
+    input: string;
+    allow: boolean;
+    reasons: NegativeSensitiveInfoRules[];
 };
 
 interface DataEmailValidationAnalysis {

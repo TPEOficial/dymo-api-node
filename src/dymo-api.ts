@@ -42,6 +42,11 @@ class DymoAPI {
                     deny: [
                         "FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"
                     ]
+                },
+                sensitiveInfo: {
+                    deny: [
+                        "EMAIL", "PHONE", "CREDIT_CARD"
+                    ]
                 }
             }
         }: {
