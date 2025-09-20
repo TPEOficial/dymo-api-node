@@ -70,7 +70,7 @@ interface DataEmailValidationAnalysis {
     plugins: {
         blocklist?: boolean;
         compromiseDetector?: boolean;
-
+        mxRecords: MxRecord[];
         nsfw?: boolean;
         reputation?: TyposquattingPlugin;
         riskScore?: number;
@@ -130,6 +130,7 @@ export interface DataValidationAnalysis {
         plugins: {
             blocklist?: boolean;
             compromiseDetector?: boolean;
+            mxRecords: MxRecord[];
             nsfw?: boolean;
             reputation?: "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
             riskScore?: number;
