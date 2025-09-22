@@ -11,6 +11,7 @@ export default {
         }]
     },
     moduleNameMapper: {
-        "^(\\.{1,2}/.*)\\.js$": "$1"
+        "^(\\.{1,2}/.*)\\.js$": "$1",
+        "^@/(.*)$": "<rootDir>/src/$1"
     }
 };

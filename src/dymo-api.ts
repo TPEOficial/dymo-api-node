@@ -1,7 +1,10 @@
-import config, { setBaseUrl } from "./config";
+import config from "./config";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import * as Interfaces from "./lib/types/interfaces";
+
+import axios, { AxiosInstance } from "axios";
+import { validBaseURL } from "./utils/basics";
 
 const customError = (code: number, message: string): Error => {
     return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
@@ -13,6 +16,7 @@ class DymoAPI {
     private serverEmailConfig?: Interfaces.ServerEmailConfig;
     private rules: Interfaces.Rules;
     private baseUrl: string;
+    private axiosClient: AxiosInstance;
 
     /**
      * @param {Object} options - Options to create the DymoAPI instance.
@@ -28,7 +32,7 @@ class DymoAPI {
      * @example
      * const dymoApi = new DymoAPI({
      *     rootApiKey: "6bfb7675-6b69-4f8d-9f43-5a6f7f02c6c5",
-     *     apiKey: "4c8b7675-6b69-4f8d-9f43-5a6f7f02c6c5"
+     *     apiKey: "dm_4c8b7675-6b69-4f8d-9f43-5a6f7f02c6c5"
      * });
      */
     constructor({
@@ -54,7 +58,17 @@ class DymoAPI {
         this.apiKey = apiKey;
         this.serverEmailConfig = serverEmailConfig;
         this.baseUrl = baseUrl;
-        setBaseUrl(baseUrl);
+
+        // We created the Axios client with the appropriate settings.
+        this.axiosClient = axios.create({
+            baseURL: `${validBaseURL(this.baseUrl)}/v1`,
+            headers: {
+                "User-Agent": "DymoAPISDK/1.0.0"
+            }
+        });
+
+        // We set the authorization in the Axios client to make requests.
+        if (this.rootApiKey || this.apiKey) this.axiosClient.defaults.headers.Authorization = `Bearer ${this.rootApiKey || this.apiKey}`;
     };
 
     // FUNCTIONS / Private.
@@ -80,7 +94,7 @@ class DymoAPI {
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
      */
     async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
-        return await PrivateAPI.isValidData(this.rootApiKey || this.apiKey, data);
+        return await PrivateAPI.isValidData(this.axiosClient, data);
     };
 
     /**
@@ -105,7 +119,7 @@ class DymoAPI {
         email: Interfaces.EmailValidator,
         rules: Interfaces.EmailValidatorRules = this.rules.email!
     ): Promise<Interfaces.EmailValidatorResponse> {
-        return await PrivateAPI.isValidEmail(this.rootApiKey || this.apiKey, email, rules);
+        return await PrivateAPI.isValidEmail(this.axiosClient, email, rules);
     };
 
     /**
@@ -136,7 +150,7 @@ class DymoAPI {
      */
     async sendEmail(data: Interfaces.SendEmail): Promise<Interfaces.EmailStatus> {
         if (!this.serverEmailConfig && !this.rootApiKey) console.error(`[${config.lib.name}] You must configure the email client settings.`);
-        return await PrivateAPI.sendEmail(this.rootApiKey || this.apiKey, { serverEmailConfig: this.serverEmailConfig, ...data });
+        return await PrivateAPI.sendEmail(this.axiosClient, { serverEmailConfig: this.serverEmailConfig, ...data });
     };
 
     /**
@@ -155,7 +169,7 @@ class DymoAPI {
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/secure-random-number-generator)
      */
     async getRandom(data: Interfaces.SRNG): Promise<Interfaces.SRNSummary> {
-        return await PrivateAPI.getRandom(this.rootApiKey || this.apiKey, data);
+        return await PrivateAPI.getRandom(this.axiosClient, data);
     };
 
     
@@ -172,7 +186,7 @@ class DymoAPI {
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/textly/text-extraction)
      */
     async extractWithTextly(data: Interfaces.ExtractWithTextly): Promise<any> {
-        return await PrivateAPI.extractWithTextly(this.rootApiKey || this.apiKey, data);
+        return await PrivateAPI.extractWithTextly(this.axiosClient, data);
     };
 
     // FUNCTIONS / Public.
@@ -191,7 +205,7 @@ class DymoAPI {
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/prayertimes)
      */
     async getPrayerTimes(data: Interfaces.PrayerTimesData): Promise<Interfaces.CountryPrayerTimes | { error: string }> {
-        return await PublicAPI.getPrayerTimes(data);
+        return await PublicAPI.getPrayerTimes(this.axiosClient, data);
     };
 
     /**
@@ -206,7 +220,7 @@ class DymoAPI {
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/input-satinizer)
      */
     async satinizer(data: Interfaces.InputSatinizerData): Promise<Interfaces.SatinizedInputAnalysis> {
-        return await PublicAPI.satinizer(data);
+        return await PublicAPI.satinizer(this.axiosClient, data);
     };
 
     /**
@@ -235,7 +249,7 @@ class DymoAPI {
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/password-validator)
      */
     async isValidPwd(data: Interfaces.IsValidPwdData): Promise<Interfaces.PasswordValidationResult> {
-        return await PublicAPI.isValidPwd(data);
+        return await PublicAPI.isValidPwd(this.axiosClient, data);
     };
 };
 
