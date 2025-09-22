@@ -45,8 +45,9 @@ class DymoAPI {
         rules?: Interfaces.Rules;
     } = {}) {
         this.rules = {
-            email: { deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
-            sensitiveInfo: { deny: ["EMAIL", "PHONE", "CREDIT_CARD"] },
+            bot: { mode: "LIVE", allow: [] },
+            email: { mode: "LIVE", deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
+            sensitiveInfo: { mode: "LIVE", deny: ["EMAIL", "PHONE", "CREDIT_CARD"] },
             ...rules
         };
         this.rootApiKey = rootApiKey;
