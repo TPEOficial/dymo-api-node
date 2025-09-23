@@ -22,7 +22,6 @@ const getIp = (req: GenericRequest): string | undefined => {
     );
 };
 
-// handler principal
 export const handleRequest = <T = any>(req: GenericRequest<T>) => {
     return {
         body: req.body,

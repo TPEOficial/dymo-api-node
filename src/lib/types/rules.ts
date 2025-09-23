@@ -23,7 +23,7 @@ export interface SensitiveInfoRules {
 
 // -------------------- DYMO MAIN CLIENT RULES -------------------- //
 export interface Rules {
-    waf?: WafRules;
     email?: EmailValidatorRules;
     sensitiveInfo?: SensitiveInfoRules;
+    waf?: WafRules;
 }
