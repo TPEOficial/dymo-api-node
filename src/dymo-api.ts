@@ -113,7 +113,7 @@ class DymoAPI {
      * @example
      * const valid = await dymoClient.isValidEmail("user@example.com", { deny: ["FRAUD", "NO_MX_RECORDS"] });
      * 
-     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
+     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/request-verifier)
      */
     async isValidEmail(
         email: Interfaces.EmailValidator,
@@ -131,6 +131,8 @@ class DymoAPI {
      * @param {Object} req - The request object to be protected.
      * @param {Interfaces.WafRules} [rules] - Optional rules for protection. Some rules are premium features.
      * @returns {Promise<Interfaces.HTTPRequest>} Resolves with the protected request.
+     * @important
+     * **⚠️ This is a [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) and BETA feature.**
      * @throws Will throw an error if protection cannot be performed.
      *
      * @example
