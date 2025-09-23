@@ -12,8 +12,7 @@ import * as Interfaces from "@/lib/types/interfaces";
  *
  * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/input-satinizer)
  */
-export const satinizer = async (axiosClient: AxiosInstance, data: Interfaces.InputSatinizerData): Promise<any> => {
-    const { input } = data;
+export const satinize = async (axiosClient: AxiosInstance, input: string): Promise<any> => {
     if (input === undefined) throw customError(1000, "You must specify at least the input.");
     try {
         const response = await axiosClient.get("/public/inputSatinizer", { params: { input: encodeURIComponent(input) } });

@@ -212,6 +212,7 @@ class DymoAPI {
      * Satinizes the input, replacing any special characters with their HTML
      * entities.
      *
+     * @deprecated Use `satinize` instead. This feature will be removed soon.
      * @param {Object} data - The data to be sent.
      * @param {string} data.input - The input to be satinized.
      * @returns {Promise<Interfaces.SatinizedInputAnalysis>} A promise that resolves to the response from the server.
@@ -219,8 +220,23 @@ class DymoAPI {
      *
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/input-satinizer)
      */
-    async satinizer(data: Interfaces.InputSatinizerData): Promise<Interfaces.SatinizedInputAnalysis> {
-        return await PublicAPI.satinizer(this.axiosClient, data);
+    async satinizer(data: { input: string; }): Promise<Interfaces.SatinizedInputAnalysis> {
+        return await PublicAPI.satinize(this.axiosClient, data.input);
+    };
+
+    /**
+     * Satinizes the input, replacing any special characters with their HTML
+     * entities.
+     *
+     * @param {Object} data - The data to be sent.
+     * @param {string} data.input - The input to be satinized.
+     * @returns {Promise<Interfaces.SatinizedInputAnalysis>} A promise that resolves to the response from the server.
+     * @throws Will throw an error if there is an issue with the satinization process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/input-satinizer)
+     */
+    async satinize(input: string): Promise<Interfaces.SatinizedInputAnalysis> {
+        return await PublicAPI.satinize(this.axiosClient, input);
     };
 
     /**

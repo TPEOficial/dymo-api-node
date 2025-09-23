@@ -49,10 +49,6 @@ export interface PrayerTimesData {
     lon?: number;
 };
 
-export interface InputSatinizerData {
-    input?: string;
-};
-
 export interface IsValidPwdData {
     email?: string;
     password?: string;

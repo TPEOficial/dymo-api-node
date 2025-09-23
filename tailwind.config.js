@@ -5,11 +5,11 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: [...defaultTheme.fontFamily.sans],
-            },
-        },
+                sans: [...defaultTheme.fontFamily.sans]
+            }
+        }
     },
     corePlugins: {
-        preflight: false,
-    },
+        preflight: false
+    }
 };
