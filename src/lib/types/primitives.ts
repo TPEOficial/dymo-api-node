@@ -11,3 +11,11 @@ export interface CreditCard {
     cvc?: string | number;
     cvv?: string | number;
 }
+
+export interface HTTPRequest {
+    url: string;
+    method: string | "GET" | "POST" | "PUT" | "DELETE";
+    headers?: Record<string, string>;
+    body?: string | object | null;
+    [key: string]: any;
+}

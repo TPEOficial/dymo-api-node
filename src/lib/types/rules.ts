@@ -3,9 +3,12 @@ import { NegativeEmailRules, NegativeSensitiveInfoRules } from "./data-verifier"
 
 type Mode = "LIVE" | "DRY_RUN";
 
-export interface BotRules {
+type NegativeWafRules =  "FRAUD" | "VPN" | "PROXY" | "TOR_NETWORK";
+
+export interface WafRules {
     mode?: Mode;
-    allow?: WellKnownBots.WellKnownBotOrCategory[];
+    allowBots?: WellKnownBots.WellKnownBotOrCategory[];
+    deny?: NegativeWafRules[];
 }
 
 export interface EmailValidatorRules {
@@ -20,7 +23,7 @@ export interface SensitiveInfoRules {
 
 // -------------------- DYMO MAIN CLIENT RULES -------------------- //
 export interface Rules {
-    bot?: BotRules;
+    waf?: WafRules;
     email?: EmailValidatorRules;
     sensitiveInfo?: SensitiveInfoRules;
 }

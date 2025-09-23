@@ -49,9 +49,9 @@ class DymoAPI {
         rules?: Interfaces.Rules;
     } = {}) {
         this.rules = {
-            bot: { mode: "LIVE", allow: [] },
             email: { mode: "LIVE", deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
             sensitiveInfo: { mode: "LIVE", deny: ["EMAIL", "PHONE", "CREDIT_CARD"] },
+            waf: { mode: "LIVE", allowBots: ["CURL", "CATEGORY:SEARCH_ENGINE", "CATEGORY:PREVIEW"], deny: ["FRAUD", "TOR_NETWORK"] },
             ...rules
         };
         this.rootApiKey = rootApiKey;
@@ -121,6 +121,29 @@ class DymoAPI {
     ): Promise<Interfaces.EmailValidatorResponse> {
         return await PrivateAPI.isValidEmail(this.axiosClient, email, rules);
     };
+
+    /**
+     * Protects the given request against the configured rules.
+     *
+     * This method requires either the root API key or the API key to be set.
+     * If neither is set, it will throw an error.
+     *
+     * @param {Object} req - The request object to be protected.
+     * @param {Interfaces.WafRules} [rules] - Optional rules for protection. Some rules are premium features.
+     * @returns {Promise<Interfaces.HTTPRequest>} Resolves with the protected request.
+     * @throws Will throw an error if protection cannot be performed.
+     *
+     * @example
+     * const protectedReq = await dymoClient.protectReq(req);
+     * 
+     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
+    */
+    async protectReq(
+        req: Interfaces.HTTPRequest,
+        rules: Interfaces.WafRules = this.rules.waf!
+    ) {
+        return await PrivateAPI.protectReq(this.axiosClient, req, rules);
+    }
 
     /**
      * Sends an email using the configured email client settings.

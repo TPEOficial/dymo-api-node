@@ -177,4 +177,6 @@ export interface ExtractWithTextly {
 }
 
 export * from "./rules";
+export * from "./primitives";
 export * from "./data-verifier";
+export * from "./well-known-bots";

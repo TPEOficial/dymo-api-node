@@ -26,6 +26,17 @@ export const isValidEmail = async (
 ): Promise<any> => {
     if (!axiosClient.defaults.headers?.Authorization) throw customError(3000, "Invalid private token.");
     if (rules.deny.length === 0) throw customError(1500, "You must provide at least one deny rule.");
+
+    if (rules.mode === "DRY_RUN") {
+        console.warn("[Dymo API] DRY_RUN mode is enabled. No requests with real data will be processed until you switch to LIVE mode.");
+        return {
+            email,
+            allow: true,
+            reasons: [],
+            response: "CHANGE TO LIVE MODE"
+        }
+    }
+
     try {
         const responseEmail = (await axiosClient.post("/private/secure/verify", {
             email,

@@ -13,13 +13,22 @@ export interface ConfigurationOptions {
     };
     rules?: {
         email: {
+            mode: Mode;
             deny: string[];
         };
         sensitiveInfo: {
+            mode: Mode;
+            deny: string[];
+        };
+        waf: {
+            mode: Mode;
+            allowBots: string[];
             deny: string[];
         };
     };
 }
+
+type Mode = "LIVE" | "DRY_RUN";
 
 //@ts-ignore
 declare module "dymo-api" {
@@ -39,9 +48,16 @@ declare module "dymo-api" {
         };
         private rules?: {
             email: {
+                mode: Mode;
                 deny: string[];
             };
             sensitiveInfo: {
+                mode: Mode;
+                deny: string[];
+            };
+            waf: {
+                mode: Mode;
+                allowBots: string[];
                 deny: string[];
             };
         };
@@ -52,6 +68,9 @@ declare module "dymo-api" {
         // Data Validation.
         isValidData(data: any): Promise<any>;
         isValidEmail(data: any): Promise<any>;
+
+        // Data Protection.
+        protectReq(data: any): Promise<any>;
 
         getRandom(data: any): Promise<any>;
         extractWithTextly(data: any): Promise<any>;
