@@ -13,6 +13,14 @@ describe("isValidEmail", () => {
     });
 });
 
+describe("isValidEmail", () => {
+    it("Return that the email is invalid", async () => {
+        const decision = await dymoRootClient.isValidEmail("build-09-24-2025");
+        expect(decision.allow).toBe(false);
+        expect(decision.reasons).toContain("INVALID");
+    });
+});
+
 const dymoFreeUserClient = new DymoAPI({
     apiKey: process.env.DYMO_TEST_API_KEY
 });

@@ -49,7 +49,14 @@ export const isValidEmail = async (
 
         let reasons: string[] = [];
 
-        if (rules.deny.includes("INVALID") && !responseEmail.valid) reasons.push("INVALID");
+        if (rules.deny.includes("INVALID") && !responseEmail.valid) {
+            return {
+                email: responseEmail.email,
+                allow: false,
+                reasons: ["INVALID"],
+                response: responseEmail
+            };
+        }
         if (rules.deny.includes("FRAUD") && responseEmail.fraud) reasons.push("FRAUD");
         if (rules.deny.includes("PROXIED_EMAIL") && responseEmail.proxiedEmail) reasons.push("PROXIED_EMAIL");
         if (rules.deny.includes("FREE_SUBDOMAIN") && responseEmail.freeSubdomain) reasons.push("FREE_SUBDOMAIN");
