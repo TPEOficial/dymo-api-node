@@ -14,6 +14,7 @@ export interface Validator {
     ip?: string;
     wallet?: string;
     userAgent?: string;
+    iban?: string;
     plugins?: VerifyPlugins[];
 }
 
@@ -215,6 +216,22 @@ export interface DataValidationAnalysis {
             type?: string;
             brand?: string;
         };
+        plugins?: {
+            blocklist?: boolean;
+            riskScore?: number;
+        };
+    };
+    iban: {
+        valid: boolean;
+        fraud?: boolean;
+        iban?: string;
+        bban?: string;
+        bic?: string | "unknown";
+        country?: string;
+        countryCode?: string;
+        accountNumber?: string;
+        branchIdentifier?: string;
+        bankIdentifier?: string;
         plugins?: {
             blocklist?: boolean;
             riskScore?: number;

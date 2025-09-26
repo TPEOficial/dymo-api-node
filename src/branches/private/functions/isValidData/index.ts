@@ -16,7 +16,7 @@ import * as Interfaces from "@/lib/types/interfaces";
  */
 export const isValidData = async (axiosClient: AxiosInstance, data: Interfaces.Validator): Promise<any> => {
     if (!axiosClient.defaults.headers?.Authorization) throw customError(3000, "Invalid private token.");
-    if (!Object.keys(data).some((key) => ["url", "email", "phone", "domain", "creditCard", "ip", "wallet", "userAgent"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
+    if (!Object.keys(data).some((key) => ["url", "email", "phone", "domain", "creditCard", "ip", "wallet", "userAgent", "iban"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
     try {
         const response = await axiosClient.post("/private/secure/verify", data, { headers: { "Content-Type": "application/json" } });
         return response.data;
