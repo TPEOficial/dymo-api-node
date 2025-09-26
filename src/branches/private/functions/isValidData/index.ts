@@ -7,7 +7,7 @@ import * as Interfaces from "@/lib/types/interfaces";
  * 
  * @param token - A string or null representing the authentication token. Must not be null.
  * @param data - An object adhering to the Validator interface, containing at least one of the following fields: 
- *               url, email, phone, domain, creditCard, ip, wallet or user agent.
+ *               url, email, phone, domain, creditCard, ip, wallet, user agent or iban.
  * 
  * @returns A promise that resolves to the response data from the verification endpoint.
  * 

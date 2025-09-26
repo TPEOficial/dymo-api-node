@@ -87,6 +87,7 @@ class DymoAPI {
      * @param {string} [data.ip] - Optional IP address to be validated.
      * @param {string} [data.wallet] - Optional wallet address to be validated.
      * @param {string} [data.userAgent] - Optional user agent string to be validated.
+     * @param {string} [data.iban] - Optional IBAN to be validated.
      * @param {Interfaces.VerifyPlugins[]} [data.plugins] - Optional array of verification plugins to be used.
      * @returns {Promise<Interfaces.DataValidationAnalysis>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the validation process.

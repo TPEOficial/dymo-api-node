@@ -55,7 +55,8 @@ const dymoClient = new DymoAPI({
         },
         ip: "52.94.236.248",
         wallet: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+        iban: "ES8101825332130207315465"
     })
 })();
 ```
