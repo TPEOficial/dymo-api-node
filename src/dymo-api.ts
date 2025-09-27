@@ -63,7 +63,9 @@ class DymoAPI {
         this.axiosClient = axios.create({
             baseURL: `${validBaseURL(this.baseUrl)}/v1`,
             headers: {
-                "User-Agent": "DymoAPISDK/1.0.0"
+                "User-Agent": "DymoAPISDK/1.0.0",
+                "X-Dymo-SDK-Env": "Node",
+                "X-Dymo-SDK-Version": "1.2.11"
             }
         });
 
