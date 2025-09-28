@@ -1,14 +1,9 @@
 import config from "./config";
+import axios, { AxiosInstance } from "axios";
+import { validBaseURL } from "./utils/basics";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import * as Interfaces from "./lib/types/interfaces";
-
-import axios, { AxiosInstance } from "axios";
-import { validBaseURL } from "./utils/basics";
-
-const customError = (code: number, message: string): Error => {
-    return Object.assign(new Error(), { code, message: `[${config.lib.name}] ${message}` });
-};
 
 class DymoAPI {
     private rootApiKey: string | null;
@@ -65,7 +60,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.11"
+                "X-Dymo-SDK-Version": "1.2.12"
             }
         });
 
