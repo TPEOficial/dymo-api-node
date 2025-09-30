@@ -3,7 +3,7 @@ import { NegativeEmailRules, NegativeSensitiveInfoRules } from "./data-verifier"
 
 type Mode = "LIVE" | "DRY_RUN";
 
-type NegativeWafRules =  "FRAUD" | "VPN" | "PROXY" | "TOR_NETWORK";
+export type NegativeWafRules =  "FRAUD" | "VPN" | "PROXY" | "TOR_NETWORK";
 
 export interface WafRules {
     mode?: Mode;
