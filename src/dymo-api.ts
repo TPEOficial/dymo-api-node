@@ -60,7 +60,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.13"
+                "X-Dymo-SDK-Version": "1.2.16"
             }
         });
 
@@ -298,5 +298,6 @@ export type {
     EmailValidatorRules,
     WafRules,
     NegativeEmailRules,
-    SensitiveInfoRules
+    SensitiveInfoRules,
+    DataEmailValidationAnalysis
 } from "./lib/types/interfaces";

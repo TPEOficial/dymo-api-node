@@ -1,7 +1,7 @@
 import { MxRecord } from "dns";
 import { Email, Phone, CreditCard } from "./primitives";
 
-export type VerifyPlugins = "blocklist" | "compromiseDetector" | "mxRecords" | "nsfw" | "reputation" | "riskScore" | "torNetwork" | "typosquatting" | "urlShortener";
+export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reputation" | "riskScore" | "torNetwork" | "typosquatting" | "urlShortener";
 export type ReputationPlugin = "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
 export type TyposquattingPlugin = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
@@ -76,7 +76,7 @@ export type EmailValidator = Email;
  *
  * @description
  * Values indicating why an email is considered negative.
- * ⚠️ NO_MX_RECORDS, PROXIED_EMAIL, FREE_SUBDOMAIN, CORPORATE, and HIGH_RISK_SCORE are premium features.
+ * ⚠️ NO_MX_RECORDS, PROXIED_EMAIL, FREE_SUBDOMAIN, CORPORATE, NO_GRAVATAR, and HIGH_RISK_SCORE are premium features.
  */
 export type NegativeEmailRules =
     | "FRAUD"
@@ -88,6 +88,7 @@ export type NegativeEmailRules =
     | "CORPORATE_EMAIL"
     | "NO_REPLY_EMAIL"
     | "ROLE_ACCOUNT"
+    | "NO_GRAVATAR"          // ⚠️ Premium
     | "NO_REACHABLE"         // ⚠️ Premium
     | "HIGH_RISK_SCORE";     // ⚠️ Premium
 
@@ -134,7 +135,7 @@ export type SensitiveInfoResponse = {
 /**
  * Detailed analysis of an email validation.
  */
-interface DataEmailValidationAnalysis {
+export interface DataEmailValidationAnalysis {
     /** Whether the email is valid. */
     valid: boolean;
 
@@ -175,6 +176,9 @@ interface DataEmailValidationAnalysis {
     plugins: {
         /** Whether the email is blocked by a blocklist. */
         blocklist?: boolean;
+
+        /** Gravatar URL for the email. */
+        gravatarUrl?: string;
 
         /** Whether the email is flagged as a compromise. */
         compromiseDetector?: boolean;

@@ -44,7 +44,7 @@ export const isValidEmail = async (
                 rules.deny.includes("NO_MX_RECORDS") ? "mxRecords" : undefined,
                 rules.deny.includes("NO_REACHABLE") ? "reachability" : undefined,
                 rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined
-            ]
+            ].filter(Boolean)
         }, { headers: { "Content-Type": "application/json" } })).data.email;
 
         let reasons: string[] = [];

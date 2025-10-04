@@ -26,6 +26,14 @@ const dymoFreeUserClient = new DymoAPI({
 });
 
 describe("isValidEmail", () => {
+    it("Return that the email is invalid", async () => {
+        const decision = await dymoFreeUserClient.isValidEmail("build-09-30-2025", { deny: ["FRAUD", "INVALID", "NO_REPLY_EMAIL"] });
+        expect(decision.allow).toBe(false);
+        expect(decision.reasons).toContain("INVALID");
+    });
+});
+
+describe("isValidEmail", () => {
     it("Fails for free users because it uses premium rules by default", async () => {
         await expect(
             dymoFreeUserClient.isValidEmail("build-09-19-2025@tpeoficial.com")
