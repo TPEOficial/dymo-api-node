@@ -11,7 +11,7 @@ import * as Interfaces from "@/lib/types/interfaces";
  *
  * Deny rules (some are premium ⚠️):
  * - "FRAUD", "INVALID", "NO_MX_RECORDS" ⚠️, "PROXIED_EMAIL" ⚠️, "FREE_SUBDOMAIN" ⚠️,
- *   "PERSONAL_EMAIL", "CORPORATE_EMAIL", "NO_REPLY_EMAIL", "ROLE_ACCOUNT", "NO_REACHABLE", "HIGH_RISK_SCORE" ⚠️
+ *   "PERSONAL_EMAIL", "CORPORATE_EMAIL", "NO_REPLY_EMAIL", "ROLE_ACCOUNT", "NO_REACHABLE", "NO_GRAVATAR" "HIGH_RISK_SCORE" ⚠️
  *
  * @returns {Promise<boolean>} True if the email passes all deny rules, false otherwise.
  * @throws Error if token is null, rules are empty, or request fails.
@@ -43,7 +43,8 @@ export const isValidEmail = async (
             plugins: [
                 rules.deny.includes("NO_MX_RECORDS") ? "mxRecords" : undefined,
                 rules.deny.includes("NO_REACHABLE") ? "reachability" : undefined,
-                rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined
+                rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined,
+                rules.deny.includes("NO_GRAVATAR") ? "gravatar" : undefined
             ].filter(Boolean)
         }, { headers: { "Content-Type": "application/json" } })).data.email;
 
@@ -67,6 +68,7 @@ export const isValidEmail = async (
         if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.plugins.roleAccount) reasons.push("ROLE_ACCOUNT");
         if (rules.deny.includes("NO_REACHABLE") && !responseEmail.plugins.reachable) reasons.push("NO_REACHABLE");
         if (rules.deny.includes("HIGH_RISK_SCORE") && responseEmail.plugins.riskScore >= 80) reasons.push("HIGH_RISK_SCORE");
+        if (rules.deny.includes("NO_GRAVATAR") && !responseEmail.plugins.gravatar) reasons.push("NO_GRAVATAR");
 
         return {
             email: responseEmail.email,

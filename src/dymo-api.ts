@@ -60,7 +60,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.16"
+                "X-Dymo-SDK-Version": "1.2.17"
             }
         });
 

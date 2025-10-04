@@ -41,7 +41,6 @@ describe("isValidEmail", () => {
     });
 });
 
-
 describe("isValidEmail", () => {
     it("You should check because test.com is a domain reserved for testing without MX records", async () => {
         const decision = await dymoRootClient.isValidEmail("build-09-19-2025@test.com", { deny: ["NO_MX_RECORDS"] })
