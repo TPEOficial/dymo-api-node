@@ -60,7 +60,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.17"
+                "X-Dymo-SDK-Version": "1.2.18"
             }
         });
 
@@ -69,6 +69,33 @@ class DymoAPI {
     };
 
     // FUNCTIONS / Private.
+    /**
+     * Validates the given data against the configured validation settings.
+     *
+     * This method requires either the root API key or the API key to be set.
+     * If neither is set, it will throw an error.
+     *
+     * @deprecated Use `isValidDataRaw` instead. This feature will be modified soon.
+     * @param {Object} data - The data to be validated.
+     * @param {string} [data.url] - Optional URL to be validated.
+     * @param {string} [data.email] - Optional email address to be validated.
+     * @param {Interfaces.PhoneData} [data.phone] - Optional phone number data to be validated.
+     * @param {string} [data.domain] - Optional domain name to be validated.
+     * @param {string|Interfaces.CreditCardData} [data.creditCard] - Optional credit card number or data to be validated.
+     * @param {string} [data.ip] - Optional IP address to be validated.
+     * @param {string} [data.wallet] - Optional wallet address to be validated.
+     * @param {string} [data.userAgent] - Optional user agent string to be validated.
+     * @param {string} [data.iban] - Optional IBAN to be validated.
+     * @param {Interfaces.VerifyPlugins[]} [data.plugins] - Optional array of verification plugins to be used.
+     * @returns {Promise<Interfaces.DataValidationAnalysis>} A promise that resolves to the response from the server.
+     * @throws Will throw an error if there is an issue with the validation process.
+     *
+     * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
+     */
+    async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
+        return await PrivateAPI.isValidDataRaw(this.axiosClient, data);
+    };
+
     /**
      * Validates the given data against the configured validation settings.
      *
@@ -91,8 +118,8 @@ class DymoAPI {
      *
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
      */
-    async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
-        return await PrivateAPI.isValidData(this.axiosClient, data);
+    async isValidDataRaw(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
+        return await PrivateAPI.isValidDataRaw(this.axiosClient, data);
     };
 
     /**

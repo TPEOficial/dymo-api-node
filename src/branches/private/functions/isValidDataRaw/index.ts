@@ -14,7 +14,7 @@ import * as Interfaces from "@/lib/types/interfaces";
  * @throws Will throw an error if the token is null, if none of the required fields are present in the data,
  *         or if an error occurs during the verification request.
  */
-export const isValidData = async (axiosClient: AxiosInstance, data: Interfaces.Validator): Promise<any> => {
+export const isValidDataRaw = async (axiosClient: AxiosInstance, data: Interfaces.Validator): Promise<any> => {
     if (!axiosClient.defaults.headers?.Authorization) throw customError(3000, "Invalid private token.");
     if (!Object.keys(data).some((key) => ["url", "email", "phone", "domain", "creditCard", "ip", "wallet", "userAgent", "iban"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
     try {
