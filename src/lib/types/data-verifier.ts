@@ -94,14 +94,15 @@ export type NegativeEmailRules =
 
 // ------------ PHONE VALIDATOR ------------ //
 /**
- * @typedef {"FRAUD"|"INVALID""} NegativePhoneRules
- *
+ * @typedef {"FRAUD"|"INVALID"|"HIGH_RISK_SCORE"} NegativePhoneRules
+ * ⚠️ HIGH_RISK_SCORE is a premium feature.
  * @description
  * Values indicating why an phone is considered negative.
  */
 export type NegativePhoneRules =
     | "FRAUD"
-    | "INVALID";
+    | "INVALID"
+    | "HIGH_RISK_SCORE";     // ⚠️ Premium
 
 // ------------ SENSITIVE INFO VALIDATOR ------------ //
 export type NegativeSensitiveInfoRules = "EMAIL" | "PHONE" | "CREDIT_CARD" | "URL" | "DOMAIN" | "IP" | "WALLET" | "USER_AGENT";
