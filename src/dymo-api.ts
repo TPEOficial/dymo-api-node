@@ -45,6 +45,7 @@ class DymoAPI {
     } = {}) {
         this.rules = {
             email: { mode: "LIVE", deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
+            phone: { mode: "LIVE", deny: ["FRAUD", "INVALID"] },
             sensitiveInfo: { mode: "LIVE", deny: ["EMAIL", "PHONE", "CREDIT_CARD"] },
             waf: { mode: "LIVE", allowBots: ["CURL", "CATEGORY:SEARCH_ENGINE", "CATEGORY:PREVIEW"], deny: ["FRAUD", "TOR_NETWORK"] },
             ...rules
@@ -60,7 +61,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.20"
+                "X-Dymo-SDK-Version": "1.2.21"
             }
         });
 

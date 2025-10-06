@@ -16,6 +16,10 @@ export interface ConfigurationOptions {
             mode: Mode;
             deny: string[];
         };
+        phone: {
+            mode: Mode;
+            deny: string[];
+        };
         sensitiveInfo: {
             mode: Mode;
             deny: string[];
@@ -48,6 +52,10 @@ declare module "dymo-api" {
         };
         private rules?: {
             email: {
+                mode: Mode;
+                deny: string[];
+            };
+            phone: {
                 mode: Mode;
                 deny: string[];
             };

@@ -1,5 +1,5 @@
 import * as WellKnownBots from "./well-known-bots";
-import { NegativeEmailRules, NegativeSensitiveInfoRules } from "./data-verifier";
+import { NegativeEmailRules, NegativePhoneRules, NegativeSensitiveInfoRules } from "./data-verifier";
 
 type Mode = "LIVE" | "DRY_RUN";
 
@@ -16,6 +16,11 @@ export interface EmailValidatorRules {
     deny: NegativeEmailRules[];
 }
 
+export interface PhoneValidatorRules {
+    mode?: Mode;
+    deny: NegativePhoneRules[];
+}
+
 export interface SensitiveInfoRules {
     mode?: Mode;
     deny: NegativeSensitiveInfoRules[];
@@ -24,6 +29,7 @@ export interface SensitiveInfoRules {
 // -------------------- DYMO MAIN CLIENT RULES -------------------- //
 export interface Rules {
     email?: EmailValidatorRules;
+    phone?: PhoneValidatorRules;
     sensitiveInfo?: SensitiveInfoRules;
     waf?: WafRules;
 }

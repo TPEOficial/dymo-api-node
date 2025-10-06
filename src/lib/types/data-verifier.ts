@@ -92,6 +92,17 @@ export type NegativeEmailRules =
     | "NO_REACHABLE"         // ⚠️ Premium
     | "HIGH_RISK_SCORE";     // ⚠️ Premium
 
+// ------------ PHONE VALIDATOR ------------ //
+/**
+ * @typedef {"FRAUD"|"INVALID""} NegativePhoneRules
+ *
+ * @description
+ * Values indicating why an phone is considered negative.
+ */
+export type NegativePhoneRules =
+    | "FRAUD"
+    | "INVALID";
+
 // ------------ SENSITIVE INFO VALIDATOR ------------ //
 export type NegativeSensitiveInfoRules = "EMAIL" | "PHONE" | "CREDIT_CARD" | "URL" | "DOMAIN" | "IP" | "WALLET" | "USER_AGENT";
 
