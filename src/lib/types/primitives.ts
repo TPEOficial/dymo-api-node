@@ -1,4 +1,6 @@
-export type Email = `${string}@${string}` | string;
+export type Email = `${string}@${string}.${string}` | string;
+
+type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
 export type Phone = {
 
@@ -7,10 +9,11 @@ export type Phone = {
 
     /** The phone number. */
     phone: string;
-} | string;
+} | `+${string}` | string;
 
+type CvcString = `${Digit}${Digit}${Digit}` | string | number;
 
-export interface CreditCard {
+export type CreditCard = {
 
     /** The credit card number. */
     pan: string | number;
@@ -19,11 +22,11 @@ export interface CreditCard {
     expirationDate?: string;
 
     /** The security code of the credit card. */
-    cvc?: string | number;
+    cvc?: CvcString;
 
     /** The security code of the credit card. */
-    cvv?: string | number;
-}
+    cvv?: CvcString;
+} | string;
 
 export interface HTTPRequest {
 
@@ -31,7 +34,7 @@ export interface HTTPRequest {
     url: string;
 
     /** The HTTP method to use. */
-    method: string | "GET" | "POST" | "PUT" | "DELETE";
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | string;
 
     /** The headers to include in the request. */
     headers?: Record<string, string>;

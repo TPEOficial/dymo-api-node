@@ -34,7 +34,7 @@ export interface Validator {
      * Credit card number or object to validate.
      * Checks for fraud, test cards, card type, and optional blocklist or risk score plugins.
      */
-    creditCard?: string | CreditCard;
+    creditCard?: CreditCard;
 
     /** 
      * IP address to validate. Example: `192.168.0.1`.
