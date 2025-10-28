@@ -93,6 +93,7 @@ export type NegativeEmailRules =
     | "HIGH_RISK_SCORE";     // ⚠️ Premium
 
 // ------------ PHONE VALIDATOR ------------ //
+export type PhoneValidator = Phone;
 /**
  * @typedef {"FRAUD"|"INVALID"|"HIGH_RISK_SCORE"} NegativePhoneRules
  * ⚠️ HIGH_RISK_SCORE is a premium feature.
@@ -126,6 +127,25 @@ export type EmailValidatorResponse = {
 
     /** Detailed analysis of the email validation result. */
     response: DataEmailValidationAnalysis;
+};
+
+// ------------ PHONE VALIDATOR ------------ //
+
+/**
+ * Response returned by the phone validator.
+ */
+export type PhoneValidatorResponse = {
+    /** The validated phone number. */
+    phone: string;
+
+    /** Whether the email is allowed (not blocked/fraudulent). */
+    allow: boolean;
+
+    /** List of rules indicating why the email may be considered negative. */
+    reasons: NegativePhoneRules[];
+
+    /** Detailed analysis of the email validation result. */
+    response: DataPhoneValidationAnalysis;
 };
 
 // ------------ SENSITIVE INFO VALIDATOR ------------ //
@@ -218,6 +238,61 @@ export interface DataEmailValidationAnalysis {
     };
 }
 
+/**
+ * Detailed analysis of an phone validation.
+ */
+export interface DataPhoneValidationAnalysis {
+    /** Whether the phone number is valid. */
+    valid: boolean;
+
+    /** Whether the phone number is fraudulent. */
+    fraud: boolean;
+
+    /** The phone number being analyzed. */
+    phone: string;
+
+    /** The country code for the phone number. */
+    prefix: string;
+
+    /** The line type for the phone number. */
+    number: string;
+
+    /** The line type for the phone number. */
+    lineType: "PREMIUM_RATE" | "TOLL_FREE" | "SHARED_COST" | "VOIP" | "PERSONAL_NUMBER" | "PAGER" | "UAN" | "VOICEMAIL" | "FIXED_LINE_OR_MOBILE" | "FIXED_LINE" | "MOBILE" | "Unknown";
+
+    /** The carrier information for the phone number. */
+    carrierInfo: {
+
+        /** The carrier name for the phone number. */
+        carrierName: string;
+
+        /** The accuracy of the carrier information. */
+        accuracy: number;
+
+        /** The carrier country for the phone number. */
+        carrierCountry: string;
+
+        /** The carrier country code for the phone number. */
+        carrierCountryCode: string;
+    };
+
+    /** The country for the phone number. */
+    country: string;
+
+    /** The country code for the phone number. */
+    countryCode: string;
+
+    /** Results from optional validation plugins. */
+    plugins: {
+
+        /** Whether the phone number is blocked by a blocklist. */
+        blocklist?: boolean;
+
+        /** The risk score for the phone number. */
+        riskScore?: number;
+    };
+}
+
 export interface DataValidationAnalysis {
     /** URL validation result. */
     url: {
@@ -276,58 +351,7 @@ export interface DataValidationAnalysis {
     email: DataEmailValidationAnalysis;
 
     /** Phone validation result. */
-    phone: {
-
-        /** Whether the phone number is valid. */
-        valid: boolean;
-
-        /** Whether the phone number is fraudulent. */
-        fraud: boolean;
-
-        /** The phone number being analyzed. */
-        phone: string;
-
-        /** The country code for the phone number. */
-        prefix: string;
-
-        /** The line type for the phone number. */
-        number: string;
-
-        /** The line type for the phone number. */
-        lineType: "PREMIUM_RATE" | "TOLL_FREE" | "SHARED_COST" | "VOIP" | "PERSONAL_NUMBER" | "PAGER" | "UAN" | "VOICEMAIL" | "FIXED_LINE_OR_MOBILE" | "FIXED_LINE" | "MOBILE" | "Unknown";
-        
-        /** The carrier information for the phone number. */
-        carrierInfo: {
-
-            /** The carrier name for the phone number. */
-            carrierName: string;
-
-            /** The accuracy of the carrier information. */
-            accuracy: number;
-
-            /** The carrier country for the phone number. */
-            carrierCountry: string;
-
-            /** The carrier country code for the phone number. */
-            carrierCountryCode: string;
-        };
-
-        /** The country for the phone number. */
-        country: string;
-
-        /** The country code for the phone number. */
-        countryCode: string;
-
-        /** Results from optional validation plugins. */
-        plugins: {
-
-            /** Whether the phone number is blocked by a blocklist. */
-            blocklist?: boolean;
-
-            /** The risk score for the phone number. */
-            riskScore?: number;
-        };
-    };
+    phone: DataPhoneValidationAnalysis;
 
     /** Domain validation result. */
     domain: {

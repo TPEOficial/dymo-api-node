@@ -61,7 +61,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.21"
+                "X-Dymo-SDK-Version": "1.2.22"
             }
         });
 
@@ -129,7 +129,7 @@ class DymoAPI {
      * This method requires either the root API key or the API key to be set.
      * If neither is set, it will throw an error.
      *
-     * @param {string} [email] - Optional email address to validate.
+     * @param {string} [email] - Email address to validate.
      * @param {NegativeEmailRules[]} [rules] - Optional rules for validation. Some rules are premium features.
      * @important
      * **⚠️ NO_MX_RECORDS, HIGH_RISK_SCORE and NO_REACHABLE are [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) features.**
@@ -139,13 +139,38 @@ class DymoAPI {
      * @example
      * const valid = await dymoClient.isValidEmail("user@example.com", { deny: ["FRAUD", "NO_MX_RECORDS"] });
      * 
-     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/request-verifier)
+     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/email-validation)
      */
     async isValidEmail(
         email: Interfaces.EmailValidator,
         rules: Interfaces.EmailValidatorRules = this.rules.email!
     ): Promise<Interfaces.EmailValidatorResponse> {
         return await PrivateAPI.isValidEmail(this.axiosClient, email, rules);
+    };
+
+    /**
+     * Validates the given email against the configured rules.
+     *
+     * This method requires either the root API key or the API key to be set.
+     * If neither is set, it will throw an error.
+     *
+     * @param {string} [phone] - Phone number to validate.
+     * @param {NegativePhoneRules[]} [rules] - Optional rules for validation. Some rules are premium features.
+     * @important
+     * **⚠️ HIGH_RISK_SCORE is a [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) feature.**
+     * @returns {Promise<Interfaces.EmailValidatorResponse>} Resolves with the validation response.
+     * @throws Will throw an error if validation cannot be performed.
+     *
+     * @example
+     * const valid = await dymoClient.isValidPhone("+34617509462", { deny: ["FRAUD", "INVALID"] });
+     * 
+     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/phone-validation)
+     */
+    async isValidPhone(
+        phone: Interfaces.PhoneValidator,
+        rules: Interfaces.PhoneValidatorRules = this.rules.phone!
+    ): Promise<Interfaces.PhoneValidatorResponse> {
+        return await PrivateAPI.isValidPhone(this.axiosClient, phone, rules);
     };
 
     /**

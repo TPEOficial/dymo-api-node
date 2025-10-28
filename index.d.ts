@@ -77,6 +77,7 @@ declare module "dymo-api" {
         isValidData(data: any): Promise<any>;
         isValidDataRaw(data: any): Promise<any>;
         isValidEmail(data: any): Promise<any>;
+        isValidPhone(data: any): Promise<any>;
 
         // Data Protection.
         protectReq(data: any): Promise<any>;
