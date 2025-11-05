@@ -56,7 +56,7 @@ export const isValidIP = async (
             };
         }
         if (rules.deny.includes("FRAUD") && responseIP.fraud) reasons.push("FRAUD");
-        if (rules.deny.includes("TOR_NETWORK") && !responseIP.plugins.torNetwork) reasons.push("TOR_NETWORK");
+        if (rules.deny.includes("TOR_NETWORK") && responseIP.plugins.torNetwork) reasons.push("TOR_NETWORK");
         if (rules.deny.includes("HIGH_RISK_SCORE") && responseIP.plugins.riskScore >= 80) reasons.push("HIGH_RISK_SCORE");
 
         // Country block rules.
