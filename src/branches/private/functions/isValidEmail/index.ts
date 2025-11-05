@@ -42,7 +42,7 @@ export const isValidEmail = async (
             email,
             plugins: [
                 rules.deny.includes("NO_MX_RECORDS") ? "mxRecords" : undefined,
-                rules.deny.includes("NO_REACHABLE") ? "reachability" : undefined,
+                rules.deny.includes("NO_REACHABLE") ? "reachable" : undefined,
                 rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined,
                 rules.deny.includes("NO_GRAVATAR") ? "gravatar" : undefined
             ].filter(Boolean)
