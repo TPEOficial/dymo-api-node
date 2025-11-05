@@ -16,6 +16,10 @@ export interface ConfigurationOptions {
             mode: Mode;
             deny: string[];
         };
+        ip: {
+            mode: Mode;
+            deny: string[];
+        };
         phone: {
             mode: Mode;
             deny: string[];
@@ -55,6 +59,10 @@ declare module "dymo-api" {
                 mode: Mode;
                 deny: string[];
             };
+            ip: {
+                mode: Mode;
+                deny: string[];
+            };
             phone: {
                 mode: Mode;
                 deny: string[];
@@ -77,6 +85,7 @@ declare module "dymo-api" {
         isValidData(data: any): Promise<any>;
         isValidDataRaw(data: any): Promise<any>;
         isValidEmail(data: any): Promise<any>;
+        isValidIP(data: any): Promise<any>;
         isValidPhone(data: any): Promise<any>;
 
         // Data Protection.
