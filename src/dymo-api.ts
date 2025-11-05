@@ -45,6 +45,7 @@ class DymoAPI {
     } = {}) {
         this.rules = {
             email: { mode: "LIVE", deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
+            ip: { mode: "LIVE", deny: ["FRAUD", "INVALID", "TOR_NETWORK"] },
             phone: { mode: "LIVE", deny: ["FRAUD", "INVALID"] },
             sensitiveInfo: { mode: "LIVE", deny: ["EMAIL", "PHONE", "CREDIT_CARD"] },
             waf: { mode: "LIVE", allowBots: ["CURL", "CATEGORY:SEARCH_ENGINE", "CATEGORY:PREVIEW"], deny: ["FRAUD", "TOR_NETWORK"] },
@@ -61,7 +62,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.23"
+                "X-Dymo-SDK-Version": "1.2.24"
             }
         });
 
@@ -146,6 +147,31 @@ class DymoAPI {
         rules: Interfaces.EmailValidatorRules = this.rules.email!
     ): Promise<Interfaces.EmailValidatorResponse> {
         return await PrivateAPI.isValidEmail(this.axiosClient, email, rules);
+    };
+
+    /**
+     * Validates the given IP against the configured rules.
+     *
+     * This method requires either the root API key or the API key to be set.
+     * If neither is set, it will throw an error.
+     *
+     * @param {string} [ip] - IP address to validate.
+     * @param {NegativeEmailRules[]} [rules] - Optional rules for validation. Some rules are premium features.
+     * @important
+     * **⚠️ TOR_NETWORK and HIGH_RISK_SCORE are [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) features.**
+     * @returns {Promise<Interfaces.IPValidatorResponse>} Resolves with the validation response.
+     * @throws Will throw an error if validation cannot be performed.
+     *
+     * @example
+     * const valid = await isValidIP("52.94.236.248", { deny: ["FRAUD", "TOR_NETWORK", "COUNTRY:RU"] });
+     * 
+     * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/ip-validation)
+     */
+    async isValidIP(
+        ip: Interfaces.IPValidator,
+        rules: Interfaces.IPValidatorRules = this.rules.ip!
+    ): Promise<Interfaces.IPValidatorResponse> {
+        return await PrivateAPI.isValidIP(this.axiosClient, ip, rules);
     };
 
     /**

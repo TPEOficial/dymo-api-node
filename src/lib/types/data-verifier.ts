@@ -92,6 +92,22 @@ export type NegativeEmailRules =
     | "NO_REACHABLE"         // ⚠️ Premium
     | "HIGH_RISK_SCORE";     // ⚠️ Premium
 
+// ------------ IP VALIDATOR ------------ //
+export type IPValidator = string;
+/**
+ * @typedef {"FRAUD"|"INVALID"|"HIGH_RISK_SCORE"} NegativeIPRules
+ *
+ * @description
+ * Values indicating why an email is considered negative.
+ * ⚠️ TOR_NETWORK and HIGH_RISK_SCORE are premium features.
+ */
+export type NegativeIPRules =
+    | "FRAUD"
+    | "INVALID"
+    | "TOR_NETWORK"        // ⚠️ Premium
+    | "HIGH_RISK_SCORE"    // ⚠️ Premium
+    | `COUNTRY:${string}${string}`; // Two-char country code.
+
 // ------------ PHONE VALIDATOR ------------ //
 export type PhoneValidator = Phone;
 /**
@@ -127,6 +143,25 @@ export type EmailValidatorResponse = {
 
     /** Detailed analysis of the email validation result. */
     response: DataEmailValidationAnalysis;
+};
+
+// ------------ IP VALIDATOR ------------ //
+
+/**
+ * Response returned by the email validator.
+ */
+export type IPValidatorResponse = {
+    /** The validated email address. */
+    ip: string;
+
+    /** Whether the email is allowed (not blocked/fraudulent). */
+    allow: boolean;
+
+    /** List of rules indicating why the email may be considered negative. */
+    reasons: NegativeIPRules[];
+
+    /** Detailed analysis of the email validation result. */
+    response: DataIPValidationAnalysis;
 };
 
 // ------------ PHONE VALIDATOR ------------ //
@@ -235,6 +270,100 @@ export interface DataEmailValidationAnalysis {
 
         /** Whether the email is a URL shortener. */
         urlShortener?: boolean;
+    };
+}
+
+/**
+ * Detailed analysis of an IP validation.
+ */
+export interface DataIPValidationAnalysis {
+
+    /** Whether the IP address is valid. */
+    valid: boolean;
+
+    /** The type of IP address. */
+    type: "IPv4" | "IPv6" | "Invalid";
+
+    /** The IP class for the IP address. */
+    class: "A" | "B" | "C" | "D" | "E" | "Unknown" | "None";
+
+    /** Whether the IP address is fraudulent. */
+    fraud: boolean;
+
+    /** The IP address being analyzed. */
+    ip: string;
+
+    /** The continent for the IP address. */
+    continent: string;
+
+    /** The continent code for the IP address. */
+    continentCode: string;
+
+    /** The country for the IP address. */
+    country: string;
+
+    /** The country code for the IP address. */
+    countryCode: string;
+
+    /** The region code for the IP address. */
+    region: string;
+
+    /** The region name for the IP address. */
+    regionName: string;
+
+    /** The city for the IP address. */
+    city: string;
+
+    /** The district for the IP address. */
+    district: string;
+
+    /** The postal code for the IP address. */
+    zipCode: string;
+
+    /** The latitude for the IP address. */
+    lat: number;
+
+    /** The longitude for the IP address. */
+    lon: number;
+
+    /** The timezone for the IP address. */
+    timezone: string;
+
+    /** The timezone offset for the IP address. */
+    offset: number;
+
+    /** The currency for the IP address. */
+    currency: string;
+
+    /** The ISP for the IP address. */
+    isp: string;
+
+    /** The organization for the IP address. */
+    org: string;
+
+    /** The AS number for the IP address. */
+    as: string;
+
+    /** The AS name for the IP address. */
+    asname: string;
+
+    /** Whether the IP address is a mobile device. */
+    mobile: boolean;
+
+    /** Whether the IP address is a proxy. */
+    proxy: boolean;
+
+    /** Whether the IP address is hosting a website. */
+    hosting: boolean;
+
+    /** Results from optional validation plugins. */
+    plugins: {
+
+        /** Whether the IP address is blocked by a blocklist. */
+        blocklist ?: boolean;
+
+        /** The risk score for the IP address. */
+        riskScore ?: number;
     };
 }
 
@@ -433,96 +562,7 @@ export interface DataValidationAnalysis {
     };
 
     /** IP validation result. */
-    ip: {
-
-        /** Whether the IP address is valid. */
-        valid: boolean;
-
-        /** The type of IP address. */
-        type: "IPv4" | "IPv6" | "Invalid";
-
-        /** The IP class for the IP address. */
-        class: "A" | "B" | "C" | "D" | "E" | "Unknown" | "None";
-
-        /** Whether the IP address is fraudulent. */
-        fraud: boolean;
-
-        /** The IP address being analyzed. */
-        ip: string;
-
-        /** The continent for the IP address. */
-        continent: string;
-
-        /** The continent code for the IP address. */
-        continentCode: string;
-
-        /** The country for the IP address. */
-        country: string;
-
-        /** The country code for the IP address. */
-        countryCode: string;
-
-        /** The region code for the IP address. */
-        region: string;
-
-        /** The region name for the IP address. */
-        regionName: string;
-
-        /** The city for the IP address. */
-        city: string;
-
-        /** The district for the IP address. */
-        district: string;
-
-        /** The postal code for the IP address. */
-        zipCode: string;
-
-        /** The latitude for the IP address. */
-        lat: number;
-
-        /** The longitude for the IP address. */
-        lon: number;
-
-        /** The timezone for the IP address. */
-        timezone: string;
-
-        /** The timezone offset for the IP address. */
-        offset: number;
-
-        /** The currency for the IP address. */
-        currency: string;
-
-        /** The ISP for the IP address. */
-        isp: string;
-
-        /** The organization for the IP address. */
-        org: string;
-
-        /** The AS number for the IP address. */
-        as: string;
-
-        /** The AS name for the IP address. */
-        asname: string;
-
-        /** Whether the IP address is a mobile device. */
-        mobile: boolean;
-
-        /** Whether the IP address is a proxy. */
-        proxy: boolean;
-
-        /** Whether the IP address is hosting a website. */
-        hosting: boolean;
-
-        /** Results from optional validation plugins. */
-        plugins: {
-
-            /** Whether the IP address is blocked by a blocklist. */
-            blocklist?: boolean;
-
-            /** The risk score for the IP address. */
-            riskScore?: number;
-        };
-    };
+    ip: DataIPValidationAnalysis;
 
     /** Wallet validation result. */
     wallet: {
