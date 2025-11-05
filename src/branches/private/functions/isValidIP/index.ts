@@ -3,11 +3,11 @@ import { customError } from "@/utils/basics";
 import * as Interfaces from "@/lib/types/interfaces";
 
 /**
- * Validates an email using a secure verification endpoint.
+ * Validates an ip using a secure verification endpoint.
  *
  * @param {string | null} token - Authentication token (required).
- * @param {Interfaces.EmailValidator} email - Email to validate.
- * @param {Interfaces.EmailValidatorRules} [rules] - Deny rules. Defaults to ["FRAUD", "INVALID", "TOR_NETWORK"].
+ * @param {Interfaces.IPValidator} ip - IP to validate.
+ * @param {Interfaces.IPValidatorRules} [rules] - Deny rules. Defaults to ["FRAUD", "INVALID", "TOR_NETWORK"].
  *
  * Deny rules (some are premium ⚠️):
  * - "FRAUD", "INVALID", "TOR_NETWORK" ⚠️, "HIGH_RISK_SCORE" ⚠️
