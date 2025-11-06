@@ -62,7 +62,7 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.28"
+                "X-Dymo-SDK-Version": "1.2.29"
             }
         });
 
@@ -377,6 +377,9 @@ export type {
     EmailValidatorRules,
     NegativeEmailRules,
     DataEmailValidationAnalysis,
+    IPValidatorRules,
+    NegativeIPRules,
+    DataIPValidationAnalysis,
     PhoneValidatorRules,
     NegativePhoneRules,
     DataPhoneValidationAnalysis,
