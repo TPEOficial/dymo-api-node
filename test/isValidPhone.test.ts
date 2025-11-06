@@ -26,9 +26,16 @@ const dymoFreeUserClient = new DymoAPI({
 });
 
 describe("isValidPhone", () => {
-    it("Return that the email is invalid", async () => {
+    it("Return that the phone number is invalid", async () => {
         const decision = await dymoFreeUserClient.isValidPhone("+test09462", { deny: ["FRAUD", "INVALID"] });
         expect(decision.allow).toBe(false);
         expect(decision.reasons).toContain("INVALID");
+    });
+});
+
+describe("isValidPhone", () => {
+    it("It will return false because it is being blocked by a rule", async () => {
+        const decision = await dymoRootClient.isValidPhone("+34617509462", { deny: ["COUNTRY:ES"]});
+        expect(decision.allow).toBe(false);
     });
 });

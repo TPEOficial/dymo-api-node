@@ -57,6 +57,14 @@ export const isValidPhone = async (
         if (rules.deny.includes("FRAUD") && responsePhone.fraud) reasons.push("FRAUD");
         if (rules.deny.includes("HIGH_RISK_SCORE") && responsePhone.plugins.riskScore >= 80) reasons.push("HIGH_RISK_SCORE");
 
+        // Country block rules.
+        for (const rule of rules.deny) {
+            if (rule.startsWith("COUNTRY:")) {
+                const block = rule.split(":")[1]; // Extract country code.
+                if (responsePhone.countryCode === block) reasons.push(`COUNTRY:${block}`);
+            }
+        }
+
         return {
             phone: responsePhone.phone,
             allow: reasons.length === 0,

@@ -1,5 +1,5 @@
 import { MxRecord } from "dns";
-import { Email, Phone, CreditCard } from "./primitives";
+import { Email, Phone, CreditCard, Char } from "./primitives";
 
 export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reputation" | "riskScore" | "torNetwork" | "typosquatting" | "urlShortener";
 export type ReputationPlugin = "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
@@ -98,7 +98,7 @@ export type IPValidator = string;
  * @typedef {"FRAUD"|"INVALID"|"HIGH_RISK_SCORE"} NegativeIPRules
  *
  * @description
- * Values indicating why an email is considered negative.
+ * Values indicating why an IP is considered negative.
  * ⚠️ TOR_NETWORK and HIGH_RISK_SCORE are premium features.
  */
 export type NegativeIPRules =
@@ -106,7 +106,7 @@ export type NegativeIPRules =
     | "INVALID"
     | "TOR_NETWORK"        // ⚠️ Premium
     | "HIGH_RISK_SCORE"    // ⚠️ Premium
-    | `COUNTRY:${string}${string}`; // Two-char country code.
+    | `COUNTRY:${Char}${Char}`; // Two-char country code.
 
 // ------------ PHONE VALIDATOR ------------ //
 export type PhoneValidator = Phone;
@@ -119,7 +119,8 @@ export type PhoneValidator = Phone;
 export type NegativePhoneRules =
     | "FRAUD"
     | "INVALID"
-    | "HIGH_RISK_SCORE";     // ⚠️ Premium
+    | "HIGH_RISK_SCORE"     // ⚠️ Premium
+    | `COUNTRY:${Char}${Char}`; // Two-char country code.
 
 // ------------ SENSITIVE INFO VALIDATOR ------------ //
 export type NegativeSensitiveInfoRules = "EMAIL" | "PHONE" | "CREDIT_CARD" | "URL" | "DOMAIN" | "IP" | "WALLET" | "USER_AGENT";
