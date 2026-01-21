@@ -73,7 +73,7 @@ this.rules = {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.32"
+                "X-Dymo-SDK-Version": "1.2.35"
             }
         });
 

@@ -1,16 +1,16 @@
 {
   "name": "dymo-api",
-  "version": "1.2.32",
+  "version": "1.2.35",
   "description": "Flow system for Dymo API.",
-  "main": "dist/cjs/dymo-api.js",
+  "main": "dist/cjs/dymo-api.cjs",
   "module": "dist/esm/dymo-api.js",
   "types": "dist/types/dymo-api.d.ts",
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/types/dymo-api.d.ts",
       "require": "./dist/cjs/dymo-api.cjs",
-      "import": "./dist/esm/dymo-api.js",
-      "types": "./dist/types/dymo-api.d.ts"
+      "import": "./dist/esm/dymo-api.js"
     },
     "./*": {
       "require": "./dist/cjs/**/*.cjs",
@@ -24,9 +24,7 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "build:cjs": "tsc -p tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json && tsc-alias -p tsconfig.esm.json",
-    "build": "npm run clean && npm run build:cjs && npm run build:esm && node ./scripts/rename.js",
+    "build": "npm run clean && vite build",
     "start": "ts-node src/dymo-api.ts",
     "prepublishOnly": "npm run build",
     "test": "jest --runInBand --max-old-space-size=4096",
@@ -78,8 +76,9 @@
     "rimraf": "^6.0.1",
     "ts-jest": "^29.4.4",
     "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.16",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vite": "^6.4.1",
+    "vite-plugin-dts": "^4.5.4"
   },
   "prettier": {
     "tabWidth": 4,

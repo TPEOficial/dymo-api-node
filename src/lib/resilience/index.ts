@@ -10,21 +10,56 @@ class RateLimitManager {
         return RateLimitManager.instance;
     };
 
+    /**
+     * Parses a header value that could be a number or "unlimited".
+     * Returns undefined if the value is "unlimited", null, undefined, or invalid.
+     */
+    private parseHeaderValue(value: unknown): number | undefined {
+        // Handle non-string types (arrays, objects, null, undefined)
+        if (value === null || value === undefined) return undefined;
+        if (typeof value !== "string" && typeof value !== "number") return undefined;
+
+        const strValue = String(value).trim().toLowerCase();
+        if (!strValue || strValue === "unlimited") return undefined;
+
+        const parsed = parseInt(strValue, 10);
+        // Return undefined for NaN or negative values (rate limits can't be negative)
+        return (isNaN(parsed) || parsed < 0) ? undefined : parsed;
+    };
+
     updateRateLimit(clientId: string, headers: any): void {
         if (!this.tracker[clientId]) this.tracker[clientId] = {};
 
         const limitInfo = this.tracker[clientId];
 
-        if (headers["x-ratelimit-limit-requests"]) limitInfo.limit = parseInt(headers["x-ratelimit-limit-requests"]);
-        if (headers["x-ratelimit-remaining-requests"]) limitInfo.remaining = parseInt(headers["x-ratelimit-remaining-requests"]);
-        if (headers["x-ratelimit-reset-requests"]) limitInfo.resetTime = headers["x-ratelimit-reset-requests"];
-        if (headers["retry-after"]) limitInfo.retryAfter = parseInt(headers["retry-after"]);
+        // Handle headers that may be "unlimited" or missing
+        const limitRequests = headers["x-ratelimit-limit-requests"];
+        const remainingRequests = headers["x-ratelimit-remaining-requests"];
+        const resetRequests = headers["x-ratelimit-reset-requests"];
+        const retryAfter = headers["retry-after"];
+
+        // Only update numeric values if they are valid numbers (not "unlimited")
+        const parsedLimit = this.parseHeaderValue(limitRequests);
+        const parsedRemaining = this.parseHeaderValue(remainingRequests);
+        const parsedRetryAfter = this.parseHeaderValue(retryAfter);
+
+        if (parsedLimit !== undefined) limitInfo.limit = parsedLimit;
+        if (parsedRemaining !== undefined) limitInfo.remaining = parsedRemaining;
+        // Mark as unlimited if header explicitly says "unlimited"
+        if (typeof remainingRequests === "string" && remainingRequests.trim().toLowerCase() === "unlimited") limitInfo.isUnlimited = true;
+        if (resetRequests && typeof resetRequests === "string") limitInfo.resetTime = resetRequests;
+        if (parsedRetryAfter !== undefined) limitInfo.retryAfter = parsedRetryAfter;
+
         limitInfo.lastUpdated = Date.now();
     };
 
     isRateLimited(clientId: string): boolean {
         const limitInfo = this.tracker[clientId];
-        return limitInfo?.remaining !== undefined && limitInfo.remaining <= 0;
+        if (!limitInfo) return false;
+        // If marked as unlimited, never rate limited
+        if (limitInfo.isUnlimited) return false;
+        // Only consider rate limited if remaining is explicitly set and is 0 or less
+        return limitInfo.remaining !== undefined && limitInfo.remaining <= 0;
     };
 
     getRetryAfter(clientId: string): number | undefined {

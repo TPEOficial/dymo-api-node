@@ -182,6 +182,7 @@ export interface RateLimitInfo {
     resetTime?: string;
     retryAfter?: number;
     lastUpdated?: number;
+    isUnlimited?: boolean;
 }
 
 export interface RateLimitTracker {
