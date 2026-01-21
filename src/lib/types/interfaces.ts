@@ -176,6 +176,24 @@ export interface ExtractWithTextly {
     };
 }
 
+export interface RateLimitInfo {
+    limit?: number;
+    remaining?: number;
+    resetTime?: string;
+    retryAfter?: number;
+    lastUpdated?: number;
+}
+
+export interface RateLimitTracker {
+    [clientId: string]: RateLimitInfo;
+}
+
+export interface ResilienceConfig {
+    fallbackEnabled?: boolean;
+    retryAttempts?: number;
+    retryDelay?: number;
+}
+
 export * from "./rules";
 export * from "./primitives";
 export * from "./data-verifier";

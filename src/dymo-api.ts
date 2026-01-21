@@ -4,6 +4,8 @@ import { validBaseURL } from "./utils/basics";
 import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import * as Interfaces from "./lib/types/interfaces";
+import { ResilienceManager } from "./lib/resilience";
+import { FallbackDataGenerator } from "./lib/resilience/fallback";
 
 class DymoAPI {
     private rootApiKey: string | null;
@@ -12,18 +14,21 @@ class DymoAPI {
     private rules: Interfaces.Rules;
     private baseUrl: string;
     private axiosClient: AxiosInstance;
+    private resilienceManager: ResilienceManager;
 
-    /**
+/**
      * @param {Object} options - Options to create the DymoAPI instance.
      * @param {string} [options.rootApiKey] - The root API key.
      * @param {string} [options.apiKey] - The API key.
      * @param {string} [options.baseUrl] - Whether to use a local server instead of the cloud server.
      * @param {Object} [options.serverEmailConfig] - The server email config.
+     * @param {Object} [options.rules] - The rules.
+     * @param {Object} [options.resilience] - The resilience config.
      * @description
      * This is the main class to interact with the Dymo API. It should be
      * instantiated with the root API key and the API key. The root API key is
      * used to fetch the tokens and the API key is used to authenticate the
-     * requests.
+     * requests. Requests are retried once by default with exponential backoff.
      * @example
      * const dymoApi = new DymoAPI({
      *     rootApiKey: "6bfb7675-6b69-4f8d-9f43-5a6f7f02c6c5",
@@ -35,15 +40,17 @@ class DymoAPI {
         apiKey = null,
         baseUrl = "https://api.tpeoficial.com",
         serverEmailConfig = undefined,
-        rules = {}
+        rules = {},
+        resilience = {}
     }: {
         rootApiKey?: string | null;
         apiKey?: string | null;
         baseUrl?: string;
         serverEmailConfig?: Interfaces.ServerEmailConfig;
         rules?: Interfaces.Rules;
+        resilience?: Interfaces.ResilienceConfig;
     } = {}) {
-        this.rules = {
+this.rules = {
             email: { mode: "LIVE", deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
             ip: { mode: "LIVE", deny: ["FRAUD", "INVALID", "TOR_NETWORK"] },
             phone: { mode: "LIVE", deny: ["FRAUD", "INVALID"] },
@@ -55,6 +62,10 @@ class DymoAPI {
         this.apiKey = apiKey;
         this.serverEmailConfig = serverEmailConfig;
         this.baseUrl = baseUrl;
+        
+        // Initialize resilience system with client ID
+        const clientId = this.apiKey || this.rootApiKey || "anonymous";
+        this.resilienceManager = new ResilienceManager(resilience, clientId);
 
         // We created the Axios client with the appropriate settings.
         this.axiosClient = axios.create({
@@ -62,13 +73,22 @@ class DymoAPI {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.30"
+                "X-Dymo-SDK-Version": "1.2.32"
             }
         });
 
         // We set the authorization in the Axios client to make requests.
         if (this.rootApiKey || this.apiKey) this.axiosClient.defaults.headers.Authorization = `Bearer ${this.rootApiKey || this.apiKey}`;
     };
+
+    private getEmailPlugins(rules: Interfaces.EmailValidatorRules): string[] {
+        return [
+            rules.deny.includes("NO_MX_RECORDS") ? "mxRecords" : undefined,
+            rules.deny.includes("NO_REACHABLE") ? "reachable" : undefined,
+            rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined,
+            rules.deny.includes("NO_GRAVATAR") ? "gravatar" : undefined
+        ].filter(Boolean) as string[];
+    }
 
     // FUNCTIONS / Private.
     /**
@@ -94,8 +114,17 @@ class DymoAPI {
      *
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
      */
-    async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
-        return await PrivateAPI.isValidDataRaw(this.axiosClient, data);
+async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
+        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.DataValidationAnalysis>("isValidData", data);
+        return await this.resilienceManager.executeWithResilience(
+            this.axiosClient,
+            {
+                method: "POST",
+                url: "/private/secure/verify",
+                data
+            },
+            this.resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
+        );
     };
 
     /**
@@ -120,8 +149,17 @@ class DymoAPI {
      *
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
      */
-    async isValidDataRaw(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
-        return await PrivateAPI.isValidDataRaw(this.axiosClient, data);
+async isValidDataRaw(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
+        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.DataValidationAnalysis>("isValidDataRaw", data);
+        return await this.resilienceManager.executeWithResilience(
+            this.axiosClient,
+            {
+                method: "POST",
+                url: "/private/secure/verify",
+                data
+            },
+            this.resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
+        );
     };
 
     /**
@@ -142,11 +180,20 @@ class DymoAPI {
      * 
      * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/email-validation)
      */
-    async isValidEmail(
+async isValidEmail(
         email: Interfaces.EmailValidator,
         rules: Interfaces.EmailValidatorRules = this.rules.email!
     ): Promise<Interfaces.EmailValidatorResponse> {
-        return await PrivateAPI.isValidEmail(this.axiosClient, email, rules);
+        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.EmailValidatorResponse>("isValidEmail", email);
+        return await this.resilienceManager.executeWithResilience(
+            this.axiosClient,
+            {
+                method: "POST",
+                url: "/private/secure/verify",
+                data: { email, plugins: this.getEmailPlugins(rules) }
+            },
+            this.resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
+        );
     };
 
     /**
@@ -384,5 +431,6 @@ export type {
     NegativePhoneRules,
     DataPhoneValidationAnalysis,
     WafRules,
-    SensitiveInfoRules
+    SensitiveInfoRules,
+    ResilienceConfig
 } from "./lib/types/interfaces";
