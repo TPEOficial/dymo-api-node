@@ -245,6 +245,9 @@ export interface DataEmailValidationAnalysis {
         /** Whether the email is blocked by a blocklist. */
         blocklist?: boolean;
 
+        /** Whether the email has a Gravatar. */
+        gravatar?: boolean;
+
         /** Gravatar URL for the email. */
         gravatarUrl?: string;
 
@@ -252,10 +255,13 @@ export interface DataEmailValidationAnalysis {
         compromiseDetector?: boolean;
 
         /** MX records for the email domain. */
-        mxRecords: MxRecord[];
+        mxRecords?: MxRecord[];
 
         /** Whether the email is flagged as NSFW. */
         nsfw?: boolean;
+
+        /** Whether the email is reachable. */
+        reachable?: boolean;
 
         /** Reputation plugin results. */
         reputation?: TyposquattingPlugin;

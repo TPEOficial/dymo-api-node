@@ -3,7 +3,9 @@ import * as Interfaces from "../types/interfaces";
 export class FallbackDataGenerator {
     static generateFallbackData<T>(method: string, inputData?: any): T {
         switch (method) {
-            case "isValidData": return this.generateDataValidationAnalysis(inputData) as T;
+            case "isValidData":
+            case "isValidDataRaw":
+                return this.generateDataValidationAnalysis(inputData) as T;
             case "isValidEmail": return this.generateEmailValidatorResponse(inputData) as T;
             case "isValidIP": return this.generateIPValidatorResponse(inputData) as T;
             case "isValidPhone": return this.generatePhoneValidatorResponse(inputData) as T;
@@ -12,7 +14,9 @@ export class FallbackDataGenerator {
             case "getRandom": return this.generateSRNSummary(inputData) as T;
             case "extractWithTextly": return this.generateExtractWithTextly(inputData) as T;
             case "getPrayerTimes": return this.generatePrayerTimes(inputData) as T;
-            case "satinize": return this.generateSatinizedInputAnalysis(inputData) as T;
+            case "satinize":
+            case "satinizer":
+                return this.generateSatinizedInputAnalysis(inputData) as T;
             case "isValidPwd": return this.generatePasswordValidationResult(inputData) as T;
             default: throw new Error(`Unknown method for fallback: ${method}`);
         }

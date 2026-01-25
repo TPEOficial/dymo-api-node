@@ -1,6 +1,6 @@
 {
   "name": "dymo-api",
-  "version": "1.2.35",
+  "version": "1.2.37",
   "description": "Flow system for Dymo API.",
   "main": "dist/cjs/dymo-api.cjs",
   "module": "dist/esm/dymo-api.js",
@@ -31,7 +31,8 @@
     "test:watch": "jest --runInBand --watch --max-old-space-size=4096"
   },
   "repository": {
-    "url": "https://github.com/TPEOficial/dymo-api-node"
+    "type": "git",
+    "url": "git+https://github.com/TPEOficial/dymo-api-node.git"
   },
   "keywords": [
     "Dymo",

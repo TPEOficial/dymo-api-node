@@ -73,7 +73,7 @@ this.rules = {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.35"
+                "X-Dymo-SDK-Version": "1.2.36"
             }
         });
 
@@ -184,8 +184,8 @@ async isValidEmail(
         email: Interfaces.EmailValidator,
         rules: Interfaces.EmailValidatorRules = this.rules.email!
     ): Promise<Interfaces.EmailValidatorResponse> {
-        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.EmailValidatorResponse>("isValidEmail", email);
-        return await this.resilienceManager.executeWithResilience(
+        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.DataValidationAnalysis>("isValidEmail", email);
+        const response = await this.resilienceManager.executeWithResilience<Interfaces.DataValidationAnalysis>(
             this.axiosClient,
             {
                 method: "POST",
@@ -194,6 +194,39 @@ async isValidEmail(
             },
             this.resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
         );
+
+        const responseEmail = response.email;
+
+        // If the response doesn't have email data, return invalid
+        if (!responseEmail || !responseEmail.valid) {
+            return {
+                email: responseEmail?.email || (typeof email === "string" ? email : ""),
+                allow: false,
+                reasons: ["INVALID"] as Interfaces.NegativeEmailRules[],
+                response: responseEmail as Interfaces.DataEmailValidationAnalysis
+            };
+        }
+
+        const reasons: Interfaces.NegativeEmailRules[] = [];
+
+        if (rules.deny.includes("FRAUD") && responseEmail.fraud) reasons.push("FRAUD");
+        if (rules.deny.includes("PROXIED_EMAIL") && responseEmail.proxiedEmail) reasons.push("PROXIED_EMAIL");
+        if (rules.deny.includes("FREE_SUBDOMAIN") && responseEmail.freeSubdomain) reasons.push("FREE_SUBDOMAIN");
+        if (rules.deny.includes("PERSONAL_EMAIL") && !responseEmail.corporate) reasons.push("PERSONAL_EMAIL");
+        if (rules.deny.includes("CORPORATE_EMAIL") && responseEmail.corporate) reasons.push("CORPORATE_EMAIL");
+        if (rules.deny.includes("NO_MX_RECORDS") && responseEmail.plugins?.mxRecords?.length === 0) reasons.push("NO_MX_RECORDS");
+        if (rules.deny.includes("NO_REPLY_EMAIL") && responseEmail.noReply) reasons.push("NO_REPLY_EMAIL");
+        if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.roleAccount) reasons.push("ROLE_ACCOUNT");
+        if (rules.deny.includes("NO_REACHABLE") && responseEmail.plugins?.reachable === false) reasons.push("NO_REACHABLE");
+        if (rules.deny.includes("HIGH_RISK_SCORE") && (responseEmail.plugins?.riskScore ?? 0) >= 80) reasons.push("HIGH_RISK_SCORE");
+        if (rules.deny.includes("NO_GRAVATAR") && !responseEmail.plugins?.gravatar) reasons.push("NO_GRAVATAR");
+
+        return {
+            email: responseEmail.email,
+            allow: reasons.length === 0,
+            reasons,
+            response: responseEmail
+        };
     };
 
     /**
