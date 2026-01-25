@@ -5,7 +5,6 @@ import * as PublicAPI from "./branches/public";
 import * as PrivateAPI from "./branches/private";
 import * as Interfaces from "./lib/types/interfaces";
 import { ResilienceManager } from "./lib/resilience";
-import { FallbackDataGenerator } from "./lib/resilience/fallback";
 
 class DymoAPI {
     private rootApiKey: string | null;
@@ -16,7 +15,7 @@ class DymoAPI {
     private axiosClient: AxiosInstance;
     private resilienceManager: ResilienceManager;
 
-/**
+    /**
      * @param {Object} options - Options to create the DymoAPI instance.
      * @param {string} [options.rootApiKey] - The root API key.
      * @param {string} [options.apiKey] - The API key.
@@ -50,7 +49,7 @@ class DymoAPI {
         rules?: Interfaces.Rules;
         resilience?: Interfaces.ResilienceConfig;
     } = {}) {
-this.rules = {
+        this.rules = {
             email: { mode: "LIVE", deny: ["FRAUD", "INVALID", "NO_MX_RECORDS", "NO_REPLY_EMAIL"] },
             ip: { mode: "LIVE", deny: ["FRAUD", "INVALID", "TOR_NETWORK"] },
             phone: { mode: "LIVE", deny: ["FRAUD", "INVALID"] },
@@ -62,7 +61,7 @@ this.rules = {
         this.apiKey = apiKey;
         this.serverEmailConfig = serverEmailConfig;
         this.baseUrl = baseUrl;
-        
+
         // Initialize resilience system with client ID
         const clientId = this.apiKey || this.rootApiKey || "anonymous";
         this.resilienceManager = new ResilienceManager(resilience, clientId);
@@ -73,22 +72,13 @@ this.rules = {
             headers: {
                 "User-Agent": "DymoAPISDK/1.0.0",
                 "X-Dymo-SDK-Env": "Node",
-                "X-Dymo-SDK-Version": "1.2.36"
+                "X-Dymo-SDK-Version": "1.2.38"
             }
         });
 
         // We set the authorization in the Axios client to make requests.
         if (this.rootApiKey || this.apiKey) this.axiosClient.defaults.headers.Authorization = `Bearer ${this.rootApiKey || this.apiKey}`;
     };
-
-    private getEmailPlugins(rules: Interfaces.EmailValidatorRules): string[] {
-        return [
-            rules.deny.includes("NO_MX_RECORDS") ? "mxRecords" : undefined,
-            rules.deny.includes("NO_REACHABLE") ? "reachable" : undefined,
-            rules.deny.includes("HIGH_RISK_SCORE") ? "riskScore" : undefined,
-            rules.deny.includes("NO_GRAVATAR") ? "gravatar" : undefined
-        ].filter(Boolean) as string[];
-    }
 
     // FUNCTIONS / Private.
     /**
@@ -114,17 +104,8 @@ this.rules = {
      *
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
      */
-async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
-        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.DataValidationAnalysis>("isValidData", data);
-        return await this.resilienceManager.executeWithResilience(
-            this.axiosClient,
-            {
-                method: "POST",
-                url: "/private/secure/verify",
-                data
-            },
-            this.resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
-        );
+    async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
+        return await PrivateAPI.isValidDataRaw({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, data });
     };
 
     /**
@@ -149,17 +130,8 @@ async isValidData(data: Interfaces.Validator): Promise<Interfaces.DataValidation
      *
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
      */
-async isValidDataRaw(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
-        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.DataValidationAnalysis>("isValidDataRaw", data);
-        return await this.resilienceManager.executeWithResilience(
-            this.axiosClient,
-            {
-                method: "POST",
-                url: "/private/secure/verify",
-                data
-            },
-            this.resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
-        );
+    async isValidDataRaw(data: Interfaces.Validator): Promise<Interfaces.DataValidationAnalysis> {
+        return await PrivateAPI.isValidDataRaw({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, data });
     };
 
     /**
@@ -177,56 +149,14 @@ async isValidDataRaw(data: Interfaces.Validator): Promise<Interfaces.DataValidat
      *
      * @example
      * const valid = await dymoClient.isValidEmail("user@example.com", { deny: ["FRAUD", "NO_MX_RECORDS"] });
-     * 
+     *
      * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/email-validation)
      */
-async isValidEmail(
+    async isValidEmail(
         email: Interfaces.EmailValidator,
         rules: Interfaces.EmailValidatorRules = this.rules.email!
     ): Promise<Interfaces.EmailValidatorResponse> {
-        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.DataValidationAnalysis>("isValidEmail", email);
-        const response = await this.resilienceManager.executeWithResilience<Interfaces.DataValidationAnalysis>(
-            this.axiosClient,
-            {
-                method: "POST",
-                url: "/private/secure/verify",
-                data: { email, plugins: this.getEmailPlugins(rules) }
-            },
-            this.resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
-        );
-
-        const responseEmail = response.email;
-
-        // If the response doesn't have email data, return invalid
-        if (!responseEmail || !responseEmail.valid) {
-            return {
-                email: responseEmail?.email || (typeof email === "string" ? email : ""),
-                allow: false,
-                reasons: ["INVALID"] as Interfaces.NegativeEmailRules[],
-                response: responseEmail as Interfaces.DataEmailValidationAnalysis
-            };
-        }
-
-        const reasons: Interfaces.NegativeEmailRules[] = [];
-
-        if (rules.deny.includes("FRAUD") && responseEmail.fraud) reasons.push("FRAUD");
-        if (rules.deny.includes("PROXIED_EMAIL") && responseEmail.proxiedEmail) reasons.push("PROXIED_EMAIL");
-        if (rules.deny.includes("FREE_SUBDOMAIN") && responseEmail.freeSubdomain) reasons.push("FREE_SUBDOMAIN");
-        if (rules.deny.includes("PERSONAL_EMAIL") && !responseEmail.corporate) reasons.push("PERSONAL_EMAIL");
-        if (rules.deny.includes("CORPORATE_EMAIL") && responseEmail.corporate) reasons.push("CORPORATE_EMAIL");
-        if (rules.deny.includes("NO_MX_RECORDS") && responseEmail.plugins?.mxRecords?.length === 0) reasons.push("NO_MX_RECORDS");
-        if (rules.deny.includes("NO_REPLY_EMAIL") && responseEmail.noReply) reasons.push("NO_REPLY_EMAIL");
-        if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.roleAccount) reasons.push("ROLE_ACCOUNT");
-        if (rules.deny.includes("NO_REACHABLE") && responseEmail.plugins?.reachable === false) reasons.push("NO_REACHABLE");
-        if (rules.deny.includes("HIGH_RISK_SCORE") && (responseEmail.plugins?.riskScore ?? 0) >= 80) reasons.push("HIGH_RISK_SCORE");
-        if (rules.deny.includes("NO_GRAVATAR") && !responseEmail.plugins?.gravatar) reasons.push("NO_GRAVATAR");
-
-        return {
-            email: responseEmail.email,
-            allow: reasons.length === 0,
-            reasons,
-            response: responseEmail
-        };
+        return await PrivateAPI.isValidEmail({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, email, rules });
     };
 
     /**
@@ -236,7 +166,7 @@ async isValidEmail(
      * If neither is set, it will throw an error.
      *
      * @param {string} [ip] - IP address to validate.
-     * @param {NegativeEmailRules[]} [rules] - Optional rules for validation. Some rules are premium features.
+     * @param {NegativeIPRules[]} [rules] - Optional rules for validation. Some rules are premium features.
      * @important
      * **⚠️ TOR_NETWORK and HIGH_RISK_SCORE are [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) features.**
      * @returns {Promise<Interfaces.IPValidatorResponse>} Resolves with the validation response.
@@ -244,18 +174,18 @@ async isValidEmail(
      *
      * @example
      * const valid = await isValidIP("52.94.236.248", { deny: ["FRAUD", "TOR_NETWORK", "COUNTRY:RU"] });
-     * 
+     *
      * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/ip-validation)
      */
     async isValidIP(
         ip: Interfaces.IPValidator,
         rules: Interfaces.IPValidatorRules = this.rules.ip!
     ): Promise<Interfaces.IPValidatorResponse> {
-        return await PrivateAPI.isValidIP(this.axiosClient, ip, rules);
+        return await PrivateAPI.isValidIP({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, ip, rules });
     };
 
     /**
-     * Validates the given email against the configured rules.
+     * Validates the given phone against the configured rules.
      *
      * This method requires either the root API key or the API key to be set.
      * If neither is set, it will throw an error.
@@ -264,19 +194,19 @@ async isValidEmail(
      * @param {NegativePhoneRules[]} [rules] - Optional rules for validation. Some rules are premium features.
      * @important
      * **⚠️ HIGH_RISK_SCORE is a [PREMIUM](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier) feature.**
-     * @returns {Promise<Interfaces.EmailValidatorResponse>} Resolves with the validation response.
+     * @returns {Promise<Interfaces.PhoneValidatorResponse>} Resolves with the validation response.
      * @throws Will throw an error if validation cannot be performed.
      *
      * @example
      * const valid = await dymoClient.isValidPhone("+34617509462", { deny: ["FRAUD", "INVALID"] });
-     * 
+     *
      * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/phone-validation)
      */
     async isValidPhone(
         phone: Interfaces.PhoneValidator,
         rules: Interfaces.PhoneValidatorRules = this.rules.phone!
     ): Promise<Interfaces.PhoneValidatorResponse> {
-        return await PrivateAPI.isValidPhone(this.axiosClient, phone, rules);
+        return await PrivateAPI.isValidPhone({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, phone, rules });
     };
 
     /**
@@ -294,15 +224,15 @@ async isValidEmail(
      *
      * @example
      * const protectedReq = await dymoClient.protectReq(req);
-     * 
+     *
      * @see [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/data-verifier)
     */
     async protectReq(
         req: Interfaces.HTTPRequest,
         rules: Interfaces.WafRules = this.rules.waf!
     ) {
-        return await PrivateAPI.protectReq(this.axiosClient, req, rules);
-    }
+        return await PrivateAPI.protectReq({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, req, rules });
+    };
 
     /**
      * Sends an email using the configured email client settings.
@@ -332,7 +262,7 @@ async isValidEmail(
      */
     async sendEmail(data: Interfaces.SendEmail): Promise<Interfaces.EmailStatus> {
         if (!this.serverEmailConfig && !this.rootApiKey) console.error(`[${config.lib.name}] You must configure the email client settings.`);
-        return await PrivateAPI.sendEmail(this.axiosClient, { serverEmailConfig: this.serverEmailConfig, ...data });
+        return await PrivateAPI.sendEmail({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, data: { serverEmailConfig: this.serverEmailConfig, ...data } });
     };
 
     /**
@@ -351,10 +281,9 @@ async isValidEmail(
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/secure-random-number-generator)
      */
     async getRandom(data: Interfaces.SRNG): Promise<Interfaces.SRNSummary> {
-        return await PrivateAPI.getRandom(this.axiosClient, data);
+        return await PrivateAPI.getRandom({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, data });
     };
 
-    
     /**
      * Extracts structured data from a given string using Textly.
      *
@@ -368,7 +297,7 @@ async isValidEmail(
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/private/textly/text-extraction)
      */
     async extractWithTextly(data: Interfaces.ExtractWithTextly): Promise<any> {
-        return await PrivateAPI.extractWithTextly(this.axiosClient, data);
+        return await PrivateAPI.extractWithTextly({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, data });
     };
 
     // FUNCTIONS / Public.
@@ -387,7 +316,7 @@ async isValidEmail(
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/prayertimes)
      */
     async getPrayerTimes(data: Interfaces.PrayerTimesData): Promise<Interfaces.CountryPrayerTimes | { error: string }> {
-        return await PublicAPI.getPrayerTimes(this.axiosClient, data);
+        return await PublicAPI.getPrayerTimes({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, data });
     };
 
     /**
@@ -403,22 +332,21 @@ async isValidEmail(
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/input-satinizer)
      */
     async satinizer(data: { input: string; }): Promise<Interfaces.SatinizedInputAnalysis> {
-        return await PublicAPI.satinize(this.axiosClient, data.input);
+        return await this.satinize(data.input);
     };
 
     /**
      * Satinizes the input, replacing any special characters with their HTML
      * entities.
      *
-     * @param {Object} data - The data to be sent.
-     * @param {string} data.input - The input to be satinized.
+     * @param {string} input - The input to be satinized.
      * @returns {Promise<Interfaces.SatinizedInputAnalysis>} A promise that resolves to the response from the server.
      * @throws Will throw an error if there is an issue with the satinization process.
      *
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/input-satinizer)
      */
     async satinize(input: string): Promise<Interfaces.SatinizedInputAnalysis> {
-        return await PublicAPI.satinize(this.axiosClient, input);
+        return await PublicAPI.satinize({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, input });
     };
 
     /**
@@ -447,7 +375,7 @@ async isValidEmail(
      * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/password-validator)
      */
     async isValidPwd(data: Interfaces.IsValidPwdData): Promise<Interfaces.PasswordValidationResult> {
-        return await PublicAPI.isValidPwd(this.axiosClient, data);
+        return await PublicAPI.isValidPwd({ axiosClient: this.axiosClient, resilienceManager: this.resilienceManager, data });
     };
 };
 

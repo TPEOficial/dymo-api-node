@@ -8,7 +8,7 @@ const dymoRootClient = new DymoAPI({
 
 describe("isValidData", () => {
     it("Validate all data correctly", async () => {
-        const response = await dymoRootClient.isValidData({
+        const response = await dymoRootClient.isValidDataRaw({
             url: "https://test.com/test",
             email: "admin@lamoncloa.gob.es",
             phone: "+34617509462",
@@ -144,7 +144,7 @@ const dymoFreeUserClient = new DymoAPI({
 describe("isValidData", () => {
     it("It fails because plugins can only be used by premium users", async () => {
         await expect(
-            dymoFreeUserClient.isValidData({
+            dymoFreeUserClient.isValidDataRaw({
                 url: "https://test.com/test",
                 email: "build-09-20-2025@tpeoficial.com",
                 phone: "+34617509462",

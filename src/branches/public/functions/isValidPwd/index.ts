@@ -1,33 +1,23 @@
 import { type AxiosInstance } from "axios";
 import { customError } from "@/utils/basics";
 import * as Interfaces from "@/lib/types/interfaces";
+import { ResilienceManager } from "@/lib/resilience";
+import { FallbackDataGenerator } from "@/lib/resilience/fallback";
+
+interface IsValidPwdParams {
+    axiosClient: AxiosInstance;
+    resilienceManager?: ResilienceManager;
+    data: Interfaces.IsValidPwdData;
+}
 
 /**
  * Validates a password based on the given parameters.
- *
- * This method requires the password to be provided in the data object.
- * If the password is not provided, it will throw an error. The method
- * will validate the password against the following rules:
- *  - The password must be at least 8 characters long.
- *  - The password must be at most 32 characters long.
- *  - The password must contain at least one uppercase letter.
- *  - The password must contain at least one lowercase letter.
- *  - The password must contain at least one number.
- *  - The password must contain at least one special character.
- *  - The password must not contain any of the given banned words.
- *
- * @param {Interfaces.IsValidPwdData} data - The data to be sent.
- * @param {string} [data.email] - Optional email associated with the password.
- * @param {string} data.password - The password to be validated.
- * @param {string | string[]} [data.bannedWords] - The list of banned words that the password must not contain.
- * @param {number} [data.min] - Minimum length of the password. Defaults to 8 if not provided.
- * @param {number} [data.max] - Maximum length of the password. Defaults to 32 if not provided.
- * @returns {Promise<Interfaces.PasswordValidationResult>} A promise that resolves to the response from the server.
- * @throws Will throw an error if there is an issue with the password validation process.
- *
- * [Documentation](https://docs.tpeoficial.com/docs/dymo-api/public/password-validator)
-*/
-export const isValidPwd = async (axiosClient: AxiosInstance, data: Interfaces.IsValidPwdData): Promise<any> => {
+ */
+export const isValidPwd = async ({
+    axiosClient,
+    resilienceManager,
+    data
+}: IsValidPwdParams): Promise<Interfaces.PasswordValidationResult> => {
     let { email, password, bannedWords, min, max } = data;
     if (password === undefined) throw customError(1000, "You must specify at least the password.");
     const params: { [key: string]: any; } = { password: encodeURIComponent(password) };
@@ -49,10 +39,19 @@ export const isValidPwd = async (axiosClient: AxiosInstance, data: Interfaces.Is
     if (min !== undefined) params.min = min;
     if (max !== undefined) params.max = max;
 
-    try {
+    if (resilienceManager) {
+        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.PasswordValidationResult>("isValidPwd", data);
+        return await resilienceManager.executeWithResilience<Interfaces.PasswordValidationResult>(
+            axiosClient,
+            {
+                method: "GET",
+                url: "/public/validPwd",
+                params
+            },
+            resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
+        );
+    } else {
         const response = await axiosClient.get("/public/validPwd", { params });
         return response.data;
-    } catch (error: any) {
-        throw customError(5000, error.response?.data?.message || error.message);
     }
 };

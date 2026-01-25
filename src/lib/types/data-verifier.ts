@@ -367,10 +367,13 @@ export interface DataIPValidationAnalysis {
     plugins: {
 
         /** Whether the IP address is blocked by a blocklist. */
-        blocklist ?: boolean;
+        blocklist?: boolean;
 
         /** The risk score for the IP address. */
-        riskScore ?: number;
+        riskScore?: number;
+
+        /** Whether the IP address is using Tor network. */
+        torNetwork?: boolean;
     };
 }
 

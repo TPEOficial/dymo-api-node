@@ -1,29 +1,39 @@
 import { type AxiosInstance } from "axios";
 import { customError } from "@/utils/basics";
 import * as Interfaces from "@/lib/types/interfaces";
+import { ResilienceManager } from "@/lib/resilience";
+import { FallbackDataGenerator } from "@/lib/resilience/fallback";
+
+interface IsValidDataRawParams {
+    axiosClient: AxiosInstance;
+    resilienceManager?: ResilienceManager;
+    data: Interfaces.Validator;
+}
 
 /**
  * Validates the provided data using a secure verification endpoint.
- * 
- * @param token - A string or null representing the authentication token. Must not be null.
- * @param data - An object adhering to the Validator interface, containing at least one of the following fields: 
- *               url, email, phone, domain, creditCard, ip, wallet, user agent or iban.
- * 
- * @returns A promise that resolves to the response data from the verification endpoint.
- * 
- * @throws Will throw an error if the token is null, if none of the required fields are present in the data,
- *         or if an error occurs during the verification request.
  */
-export const isValidDataRaw = async (axiosClient: AxiosInstance, data: Interfaces.Validator): Promise<any> => {
+export const isValidDataRaw = async ({
+    axiosClient,
+    resilienceManager,
+    data
+}: IsValidDataRawParams): Promise<Interfaces.DataValidationAnalysis> => {
     if (!axiosClient.defaults.headers?.Authorization) throw customError(3000, "Invalid private token.");
     if (!Object.keys(data).some((key) => ["url", "email", "phone", "domain", "creditCard", "ip", "wallet", "userAgent", "iban"].includes(key) && data.hasOwnProperty(key))) throw customError(1500, "You must provide at least one parameter.");
-    try {
+
+    if (resilienceManager) {
+        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.DataValidationAnalysis>("isValidDataRaw", data);
+        return await resilienceManager.executeWithResilience<Interfaces.DataValidationAnalysis>(
+            axiosClient,
+            {
+                method: "POST",
+                url: "/private/secure/verify",
+                data
+            },
+            resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
+        );
+    } else {
         const response = await axiosClient.post("/private/secure/verify", data, { headers: { "Content-Type": "application/json" } });
         return response.data;
-    } catch (error: any) {
-        const statusCode = error.response?.status || 500;
-        const errorMessage = error.response?.data?.message || error.message;
-        const errorDetails = JSON.stringify(error.response?.data || {});
-        throw customError(5000, `Error ${statusCode}: ${errorMessage}. Details: ${errorDetails}`);
     }
 };

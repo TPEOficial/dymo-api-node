@@ -2,16 +2,29 @@ import { type AxiosInstance } from "axios";
 import { customError } from "@/utils/basics";
 import { handleRequest } from "./requestHandler";
 import * as Interfaces from "@/lib/types/interfaces";
+import { ResilienceManager } from "@/lib/resilience";
+import { FallbackDataGenerator } from "@/lib/resilience/fallback";
+
+interface ProtectReqParams {
+    axiosClient: AxiosInstance;
+    resilienceManager?: ResilienceManager;
+    req: Interfaces.HTTPRequest;
+    rules: Interfaces.WafRules;
+}
 
 const isWellKnownBot = (ua: string): ua is Interfaces.WellKnownBot => {
     return (Object.values(Interfaces.categories).flat() as string[]).includes(ua);
 };
 
-export const protectReq = async <T>(
-    axiosClient: AxiosInstance,
-    req: Interfaces.HTTPRequest,
-    rules: Interfaces.WafRules
-): Promise<any> => {
+/**
+ * Protects a request using the WAF verification endpoint.
+ */
+export const protectReq = async <T>({
+    axiosClient,
+    resilienceManager,
+    req,
+    rules
+}: ProtectReqParams): Promise<any> => {
     if (!axiosClient.defaults.headers?.Authorization) throw customError(3000, "Invalid private token.");
     const reqData = handleRequest(req);
 
@@ -24,22 +37,29 @@ export const protectReq = async <T>(
             userAgent: reqData.userAgent,
             allow: true,
             reasons: []
-        }
+        };
     }
 
-    try {
-        const response = await axiosClient.post("/private/waf/verifyRequest", {
-            ip: reqData.ip,
-            userAgent: reqData.userAgent,
-            allowBots: rules.allowBots,
-            deny: rules.deny
-        }, { headers: { "Content-Type": "application/json" } });
+    const requestData = {
+        ip: reqData.ip,
+        userAgent: reqData.userAgent,
+        allowBots: rules.allowBots,
+        deny: rules.deny
+    };
 
+    if (resilienceManager) {
+        const fallbackData = FallbackDataGenerator.generateFallbackData<any>("protectReq", req);
+        return await resilienceManager.executeWithResilience(
+            axiosClient,
+            {
+                method: "POST",
+                url: "/private/waf/verifyRequest",
+                data: requestData
+            },
+            resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
+        );
+    } else {
+        const response = await axiosClient.post("/private/waf/verifyRequest", requestData, { headers: { "Content-Type": "application/json" } });
         return response.data;
-    } catch (error: any) {
-        const statusCode = error.response?.status || 500;
-        const errorMessage = error.response?.data?.message || error.message;
-        const errorDetails = JSON.stringify(error.response?.data || {});
-        throw customError(5000, `Error ${statusCode}: ${errorMessage}. Details: ${errorDetails}`);
     }
 };

@@ -6,6 +6,14 @@ import { type AxiosInstance } from "axios";
 import { render } from "@react-email/render";
 import { customError } from "@/utils/basics";
 import * as Interfaces from "@/lib/types/interfaces";
+import { ResilienceManager } from "@/lib/resilience";
+import { FallbackDataGenerator } from "@/lib/resilience/fallback";
+
+interface SendEmailParams {
+    axiosClient: AxiosInstance;
+    resilienceManager?: ResilienceManager;
+    data: Interfaces.SendEmail & { serverEmailConfig: Interfaces.ServerEmailConfig | undefined; };
+}
 
 const convertTailwindToInlineCss = (htmlContent: string): string => {
     return htmlContent.replace(/class="([^"]+)"( style="([^"]+)")?/g, (match, classList, _, existingStyle) => {
@@ -16,24 +24,19 @@ const convertTailwindToInlineCss = (htmlContent: string): string => {
 
 /**
  * Sends an email using a secure sending endpoint.
- * 
- * @param token - A string or null representing the authentication token. Must not be null.
- * @param data - An object adhering to the SendEmail interface, containing the following fields: 
- *               'from', 'to', 'subject', 'html' or 'react', and optionally 'attachments', 'options', 'priority', 'waitToResponse', and 'composeTailwindClasses'.
- * 
- * @returns A promise that resolves to the response data from the sending endpoint.
- * 
- * @throws Will throw an error if the token is null, if any of the required fields are missing, 
- *         if the 'react' field is not a valid React element, if the 'attachments' field exceeds the maximum allowed size of 40 MB, 
- *         or if an error occurs during the sending request.
  */
-export const sendEmail = async (axiosClient: AxiosInstance, data: Interfaces.SendEmail & { serverEmailConfig: Interfaces.ServerEmailConfig | undefined; }): Promise<any> => {
+export const sendEmail = async ({
+    axiosClient,
+    resilienceManager,
+    data
+}: SendEmailParams): Promise<Interfaces.EmailStatus> => {
     if (!axiosClient.defaults.headers?.Authorization) throw customError(3000, "Invalid private token.");
     if (!data.from) throw customError(1500, "You must provide an email address from which the following will be sent.");
     if (!data.to) throw customError(1500, "You must provide an email to be sent to.");
     if (!data.subject) throw customError(1500, "You must provide a subject for the email to be sent.");
     if (!data.html && !data.react && !React.isValidElement(data.react)) throw customError(1500, "You must provide HTML or a React component.");
     if (data.html && data.react) throw customError(1500, "You must provide only HTML or a React component, not both.");
+
     try {
         if (data.react) {
             //@ts-ignore
@@ -47,29 +50,41 @@ export const sendEmail = async (axiosClient: AxiosInstance, data: Interfaces.Sen
     } catch (error) {
         throw customError(1500, `An error occurred while rendering your React component. Details: ${error}`);
     }
-    try {
-        let totalSize = 0;
-        if (data.attachments && Array.isArray(data.attachments)) {
-            const processedAttachments = await Promise.all(
-                data.attachments.map(async (attachment) => {
-                    if ((attachment.path && attachment.content) || (!attachment.path && !attachment.content)) throw customError(1500, "You must provide either 'path' or 'content', not both.");
-                    let contentBuffer;
-                    if (attachment.path) contentBuffer = await fs.readFile(path.resolve(attachment.path));
-                    else if (attachment.content) contentBuffer = attachment.content instanceof Buffer ? attachment.content : Buffer.from(attachment.content);
-                    totalSize += Buffer.byteLength(contentBuffer!);
-                    if (totalSize > 40 * 1024 * 1024) throw customError(1500, "Attachments exceed the maximum allowed size of 40 MB.");
-                    return {
-                        filename: attachment.filename || path.basename(attachment.path || ""),
-                        content: contentBuffer,
-                        cid: attachment.cid || attachment.filename
-                    } as Interfaces.Attachment;
-                })
-            );
-            data.attachments = processedAttachments;
-        }
+
+    // Process attachments
+    let totalSize = 0;
+    if (data.attachments && Array.isArray(data.attachments)) {
+        const processedAttachments = await Promise.all(
+            data.attachments.map(async (attachment) => {
+                if ((attachment.path && attachment.content) || (!attachment.path && !attachment.content)) throw customError(1500, "You must provide either 'path' or 'content', not both.");
+                let contentBuffer;
+                if (attachment.path) contentBuffer = await fs.readFile(path.resolve(attachment.path));
+                else if (attachment.content) contentBuffer = attachment.content instanceof Buffer ? attachment.content : Buffer.from(attachment.content);
+                totalSize += Buffer.byteLength(contentBuffer!);
+                if (totalSize > 40 * 1024 * 1024) throw customError(1500, "Attachments exceed the maximum allowed size of 40 MB.");
+                return {
+                    filename: attachment.filename || path.basename(attachment.path || ""),
+                    content: contentBuffer,
+                    cid: attachment.cid || attachment.filename
+                } as Interfaces.Attachment;
+            })
+        );
+        data.attachments = processedAttachments;
+    }
+
+    if (resilienceManager) {
+        const fallbackData = FallbackDataGenerator.generateFallbackData<Interfaces.EmailStatus>("sendEmail", data);
+        return await resilienceManager.executeWithResilience<Interfaces.EmailStatus>(
+            axiosClient,
+            {
+                method: "POST",
+                url: "/private/sender/sendEmail",
+                data
+            },
+            resilienceManager.getConfig().fallbackEnabled ? fallbackData : undefined
+        );
+    } else {
         const response = await axiosClient.post("/private/sender/sendEmail", data);
         return response.data;
-    } catch (error: any) {
-        throw customError(5000, error.response?.data?.message || error.message);
     }
 };
