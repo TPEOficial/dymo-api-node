@@ -1,0 +1,36 @@
+name: Update Dependent SDKs
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to update to (leave empty for latest)'
+        required: false
+
+jobs:
+  update-dependents:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo:
+          - TPEOficial/dymo-api-zod
+          - TPEOficial/dymo-api-better-auth
+    steps:
+      - name: Get version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger update in dependent repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.DEPENDENTS_PAT }}
+          repository: ${{ matrix.repo }}
+          event-type: update-dymo-api
+          client-payload: '{"version": "${{ steps.version.outputs.version }}"}'
