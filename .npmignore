@@ -4,3 +4,4 @@ src/
 tests/
 src/__tests__/
 jest.config.js
+.claude
