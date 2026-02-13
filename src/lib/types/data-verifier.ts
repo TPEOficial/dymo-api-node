@@ -1,9 +1,33 @@
 import { MxRecord } from "dns";
 import { Email, Phone, CreditCard, Char } from "./primitives";
 
-export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reputation" | "riskScore" | "torNetwork" | "typosquatting" | "urlShortener";
+export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reputation" | "riskScore" | "socialFootprint" | "torNetwork" | "typosquatting" | "urlShortener";
 export type ReputationPlugin = "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
 export type TyposquattingPlugin = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+
+/** Platform detected by Social Footprint plugin */
+export interface SocialFootprintPlatform {
+    /** Slug identifier (e.g., "gravatar", "github") */
+    slug: string;
+    /** Display name (e.g., "Gravatar", "GitHub") */
+    platform: string;
+    /** Platform category (e.g., "images", "social", "coding") */
+    category: string;
+    /** Confidence score 0-100 */
+    confidence: number;
+    /** Additional metadata extracted from the platform */
+    metadata?: {
+        [key: string]: string | string[] | null;
+    };
+}
+
+/** Social Footprint plugin response */
+export interface SocialFootprintPlugin {
+    /** Total platforms checked */
+    totalChecked: number;
+    /** Platforms where the account was found */
+    platforms: SocialFootprintPlatform[];
+}
 
 export interface Validator {
     /** 
@@ -268,6 +292,9 @@ export interface DataEmailValidationAnalysis {
 
         /** Risk score for the email. */
         riskScore?: number;
+
+        /** Social footprint - linked accounts across platforms. */
+        socialFootprint?: SocialFootprintPlugin;
 
         /** Whether the email is in a Tor network. */
         torNetwork?: boolean;
