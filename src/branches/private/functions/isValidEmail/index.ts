@@ -79,7 +79,7 @@ export const isValidEmail = async ({
     if (rules.deny.includes("NO_MX_RECORDS") && responseEmail.plugins?.mxRecords?.length === 0) reasons.push("NO_MX_RECORDS");
     if (rules.deny.includes("NO_REPLY_EMAIL") && responseEmail.noReply) reasons.push("NO_REPLY_EMAIL");
     if (rules.deny.includes("ROLE_ACCOUNT") && responseEmail.roleAccount) reasons.push("ROLE_ACCOUNT");
-    if (rules.deny.includes("NO_REACHABLE") && responseEmail.plugins?.reachable === false) reasons.push("NO_REACHABLE");
+    if (rules.deny.includes("NO_REACHABLE") && responseEmail.plugins?.reachable && responseEmail.plugins.reachable.reachability === "invalid") reasons.push("NO_REACHABLE");
     if (rules.deny.includes("HIGH_RISK_SCORE") && (responseEmail.plugins?.riskScore ?? 0) >= 80) reasons.push("HIGH_RISK_SCORE");
     if (rules.deny.includes("NO_GRAVATAR") && !responseEmail.plugins?.gravatar) reasons.push("NO_GRAVATAR");
 

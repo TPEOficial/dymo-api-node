@@ -1,9 +1,24 @@
 import { MxRecord } from "dns";
 import { Email, Phone, CreditCard, Char } from "./primitives";
 
-export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reputation" | "riskScore" | "socialFootprint" | "torNetwork" | "typosquatting" | "urlShortener";
+export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reachable" | "reputation" | "riskScore" | "socialFootprint" | "torNetwork" | "typosquatting" | "urlShortener";
 export type ReputationPlugin = "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
 export type TyposquattingPlugin = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type IsReachable = "safe" | "invalid" | "risky" | "unknown";
+
+export interface SmtpDetails {
+    canConnectSmtp: boolean;
+    deliverable: boolean;
+    catchAll: boolean;
+    disabled: boolean;
+    fullInbox: boolean;
+    blacklisted: boolean;
+}
+
+export interface ReachableResult {
+    reachability: IsReachable;
+    smtp: SmtpDetails;
+}
 
 /** Platform detected by Social Footprint plugin */
 export interface SocialFootprintPlatform {
@@ -284,8 +299,8 @@ export interface DataEmailValidationAnalysis {
         /** Whether the email is flagged as NSFW. */
         nsfw?: boolean;
 
-        /** Whether the email is reachable. */
-        reachable?: boolean;
+        /** Reachable plugin results with SMTP details. */
+        reachable?: ReachableResult;
 
         /** Reputation plugin results. */
         reputation?: TyposquattingPlugin;

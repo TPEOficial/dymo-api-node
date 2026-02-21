@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
+import { builtinModules } from "module";
 import dts from "vite-plugin-dts";
 
 export default defineConfig({
@@ -13,9 +14,9 @@ export default defineConfig({
         emptyOutDir: true,
         rollupOptions: {
             external: [
-                "path",
-                "fs",
-                "crypto",
+                ...builtinModules,
+                ...builtinModules.map(m => `node:${m}`),
+                ...builtinModules.map(m => `${m}/promises`),
                 "axios",
                 "@react-email/render",
                 "tw-to-css",
