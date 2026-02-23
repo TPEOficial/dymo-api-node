@@ -120,6 +120,7 @@ export class FallbackDataGenerator {
                     nsfw: false,
                     reputation: "unknown" as const,
                     riskScore: 0,
+                    spam: false,
                     torNetwork: false,
                     typosquatting: 0,
                     urlShortener: false
@@ -140,6 +141,7 @@ export class FallbackDataGenerator {
                     nsfw: false,
                     reputation: "unknown" as const,
                     riskScore: 0,
+                    spam: false,
                     torNetwork: false,
                     typosquatting: 0,
                     urlShortener: false
@@ -225,6 +227,7 @@ export class FallbackDataGenerator {
                     totalChecked: 0,
                     platforms: []
                 },
+                spam: false,
                 torNetwork: false,
                 typosquatting: 0,
                 urlShortener: false
@@ -306,7 +309,8 @@ export class FallbackDataGenerator {
             countryCode: "",
             plugins: {
                 blocklist: false,
-                riskScore: 0
+                riskScore: 0,
+                spam: false
             }
         };
     };

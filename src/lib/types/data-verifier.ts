@@ -1,7 +1,7 @@
 import { MxRecord } from "dns";
 import { Email, Phone, CreditCard, Char } from "./primitives";
 
-export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reachable" | "reputation" | "riskScore" | "socialFootprint" | "torNetwork" | "typosquatting" | "urlShortener";
+export type VerifyPlugins = "blocklist" | "gravatar" | "compromiseDetector" | "mxRecords" | "nsfw" | "reachable" | "reputation" | "riskScore" | "socialFootprint" | "spam" | "torNetwork" | "typosquatting" | "urlShortener";
 export type ReputationPlugin = "low" | "medium" | "high" | "very-high" | "education" | "governmental" | "unknown";
 export type TyposquattingPlugin = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export type IsReachable = "safe" | "invalid" | "risky" | "unknown";
@@ -311,6 +311,9 @@ export interface DataEmailValidationAnalysis {
         /** Social footprint - linked accounts across platforms. */
         socialFootprint?: SocialFootprintPlugin;
 
+        /** Whether the email is flagged as spam. */
+        spam?: boolean;
+
         /** Whether the email is in a Tor network. */
         torNetwork?: boolean;
 
@@ -414,6 +417,9 @@ export interface DataIPValidationAnalysis {
         /** The risk score for the IP address. */
         riskScore?: number;
 
+        /** Whether the IP address is flagged as spam. */
+        spam?: boolean;
+
         /** Whether the IP address is using Tor network. */
         torNetwork?: boolean;
     };
@@ -471,6 +477,9 @@ export interface DataPhoneValidationAnalysis {
 
         /** The risk score for the phone number. */
         riskScore?: number;
+
+        /** Whether the phone number is flagged as spam. */
+        spam?: boolean;
     };
 }
 
@@ -516,6 +525,9 @@ export interface DataValidationAnalysis {
 
             /** Risk score for the URL. */
             riskScore?: number;
+
+            /** Whether the URL is in a spam list. */
+            spam?: boolean;
 
             /** Whether the URL is in a Tor network. */
             torNetwork?: boolean;
@@ -572,6 +584,9 @@ export interface DataValidationAnalysis {
             
             /** Risk score for the domain. */
             riskScore?: number;
+
+            /** Whether the domain is in a spam list. */
+            spam?: boolean;
 
             /** Whether the domain is in a Tor network. */
             torNetwork?: boolean;
