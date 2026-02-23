@@ -275,7 +275,8 @@ export class FallbackDataGenerator {
             hosting: false,
             plugins: {
                 blocklist: false,
-                riskScore: 0
+                riskScore: 0,
+                spam: false
             }
         };
     };
