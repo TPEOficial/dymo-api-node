@@ -271,7 +271,8 @@ export class FallbackDataGenerator {
             as: "",
             asname: "",
             mobile: false,
-            proxy: true,
+            vpn: false,
+            proxy: false,
             hosting: false,
             plugins: {
                 blocklist: false,

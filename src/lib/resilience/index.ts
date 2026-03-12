@@ -1,5 +1,5 @@
-import { ResilienceConfig, RateLimitTracker, RateLimitInfo } from "../types/interfaces";
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { AxiosInstance, AxiosRequestConfig } from "axios";
+import { ResilienceConfig, RateLimitTracker } from "../types/interfaces";
 
 class RateLimitManager {
     private static instance: RateLimitManager;
@@ -83,7 +83,7 @@ export class ResilienceManager {
     constructor(config: ResilienceConfig = {}, clientId: string = "default") {
         this.config = {
             fallbackEnabled: config.fallbackEnabled ?? false,
-            retryAttempts: Math.max(0, config.retryAttempts ?? 2), // Number of additional retries
+            retryAttempts: Math.max(0, config.retryAttempts ?? 2), // Number of additional retries.
             retryDelay: Math.max(0, config.retryDelay ?? 1000)
         };
         this.clientId = clientId;
@@ -96,7 +96,7 @@ export class ResilienceManager {
         fallbackData?: T
     ): Promise<T> {
         let lastError: Error;
-        const totalAttempts = 1 + this.config.retryAttempts; // 1 normal + N retries
+        const totalAttempts = 1 + this.config.retryAttempts; // 1 normal + N retries.
 
         // Clean up expired rate limits periodically
         this.rateLimitManager.clearExpiredLimits();
@@ -114,10 +114,10 @@ export class ResilienceManager {
             try {
                 const response = await axiosClient.request(requestConfig);
                 
-                // Update rate limit tracking
+                // Update rate limit tracking.
                 this.rateLimitManager.updateRateLimit(this.clientId, response.headers);
 
-                // Check for rate limiting
+                // Check for rate limiting.
                 if (response.status === 429) {
                     const retryAfter = this.rateLimitManager.getRetryAfter(this.clientId);
                     if (retryAfter) {
@@ -134,7 +134,7 @@ export class ResilienceManager {
                 let shouldRetry = this.shouldRetry(error);
                 const isLastAttempt = attempt === totalAttempts;
 
-                // Don't retry on rate limiting (429)
+                // Don't retry on rate limiting (429).
                 if (error.response?.status === 429) shouldRetry = false;
 
                 if (!shouldRetry || isLastAttempt) {
@@ -159,9 +159,9 @@ export class ResilienceManager {
         const isNetworkError = !error.response && error.code !== "ECONNABORTED";
         const isServerError = statusCode && statusCode >= 500;
 
-        // Retry on: network errors, server errors (5xx)
-        // DON'T retry on: rate limiting (429) - handled separately
-        // DON'T retry on: client errors (4xx except 429)
+        // Retry on: network errors, server errors (5xx).
+        // DON'T retry on: rate limiting (429) - handled separately.
+        // DON'T retry on: client errors (4xx except 429).
         return isNetworkError || isServerError;
     };
 

@@ -143,6 +143,8 @@ export type IPValidator = string;
 export type NegativeIPRules =
     | "FRAUD"
     | "INVALID"
+    | "VPN"
+    | "PROXY"
     | "TOR_NETWORK"        // ⚠️ Premium
     | "HIGH_RISK_SCORE"    // ⚠️ Premium
     | `COUNTRY:${Char}${Char}`; // Two-char country code.
@@ -401,6 +403,9 @@ export interface DataIPValidationAnalysis {
 
     /** Whether the IP address is a mobile device. */
     mobile: boolean;
+
+    /** Whether the IP address is hosting a VPN. */
+    vpn: boolean;
 
     /** Whether the IP address is a proxy. */
     proxy: boolean;
